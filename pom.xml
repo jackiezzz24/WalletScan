@@ -60,7 +60,7 @@
 			<plugin>
 				<groupId>com.github.eirslett</groupId>
 				<artifactId>frontend-maven-plugin</artifactId>
-				<version>1.6</version>
+				<version>LATEST_VERSION</version>
 				<configuration>
 					<workingDirectory>frontend</workingDirectory>
 					<installDirectory>target</installDirectory>
@@ -72,8 +72,8 @@
 							<goal>install-node-and-npm</goal>
 						</goals>
 						<configuration>
-							<nodeVersion>v8.9.4</nodeVersion>
-							<npmVersion>5.6.0</npmVersion>
+							<nodeVersion>v10.13.0</nodeVersion>
+							<npmVersion>6.4.1</npmVersion>
 						</configuration>
 					</execution>
 					<execution>
@@ -96,23 +96,23 @@
 					</execution>
 				</executions>
 			</plugin>
-			 <plugin>
+			<plugin>
 				<artifactId>maven-antrun-plugin</artifactId>
 				<executions>
-					<execution>
-						<phase>generate-resources</phase>
-						<configuration>
-							<target>
-								<copy todir="${project.build.directory}/classes/public">
-									<fileset dir="${project.basedir}/frontend/build"/>
-								</copy>
-							</target>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
+				<execution>
+				<phase>generate-resources</phase>
+				<configuration>
+					<target>
+					<copy todir="${project.build.directory}/classes/public">
+						<fileset dir="${project.basedir}/frontend/build" />
+					</copy>
+					</target>
+				</configuration>
+					<goals>
+					<goal>run</goal>
+					</goals>
 					</execution>
-				</executions>
+					</executions>
 			</plugin>
 		</plugins>
 	</build>
