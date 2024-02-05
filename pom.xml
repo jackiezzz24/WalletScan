@@ -14,9 +14,13 @@
 	<name>walletscan</name>
 	<description>Demo project for CS550</description>
 	<properties>
-		<java.version>21</java.version>
+		<java.version>17</java.version>
 	</properties>
 	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -77,8 +81,8 @@
 							<goal>install-node-and-npm</goal>
 						</goals>
 						<configuration>
-							<nodeVersion>v10.13.0</nodeVersion>
-							<npmVersion>6.4.1</npmVersion>
+							<nodeVersion>v14.15.0</nodeVersion> <!-- Updated Node.js version -->
+							<npmVersion>6.14.8</npmVersion> <!-- Updated npm version -->
 						</configuration>
 					</execution>
 					<execution>
