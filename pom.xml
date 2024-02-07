@@ -88,8 +88,8 @@
 							<goal>install-node-and-npm</goal>
 						</goals>
 						<configuration>
-							<nodeVersion>v14.15.0</nodeVersion> <!-- Updated Node.js version -->
-							<npmVersion>6.14.8</npmVersion> <!-- Updated npm version -->
+							<nodeVersion>v14.17.0</nodeVersion>
+							<npmVersion>6.14.13</npmVersion>
 						</configuration>
 					</execution>
 					<execution>
