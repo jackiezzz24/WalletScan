@@ -4,6 +4,7 @@ import com.cs5500.walletscan.model.Text;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.util.JSONPObject;
+import jakarta.annotation.PostConstruct;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -21,6 +22,8 @@ import javax.json.JsonReader;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -30,13 +33,23 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
+@Component
 public class OCRClient {
     
     private static String API_URL = "https://vision.googleapis.com/v1/images:annotate?key=";
-    private static String API_KEY = "AIzaSyDKaDElGw_F39jpvr5ngP2dZ476CDO1ktc";
+    
+    private static String API_KEY;
+    
+    @Value("${api.key}")
+    private String apiKey;
     
     private String buildURL() {
         return API_URL + API_KEY;
+    }
+    
+    @PostConstruct
+    private void init() {
+        OCRClient.API_KEY = apiKey;
     }
     
     public String performOCR(String base64Image) throws OCRException {
