@@ -1,20 +1,26 @@
 package com.cs5500.walletscan.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 @Entity
-@Table(name = "user")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "users")
 @Data
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
-    @Column(name = "username")
-    private String username;
-    @Column(name = "password")
-    private String password;
-    @Column (name = "email")
+
+    @Column (nullable = false, unique = true, length = 45)
     private String email;
+
+    @Column(nullable = false, length = 45)
+    private String username;
+
+    @Column(nullable = false, length = 640)
+    private String password;
 }
