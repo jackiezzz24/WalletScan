@@ -1,11 +1,11 @@
-import React from 'react'
+import DashboardForm from "./components/DashboardForm";
 
 function Dashboard() {
   return (
-    <div>
-      <h1>Dashboard</h1>
-    </div>
-  )
+    <>
+      <DashboardForm />
+    </>
+  );
 }
 
-export default Dashboard
+export default Dashboard;

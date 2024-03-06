@@ -16,6 +16,7 @@ public class UserDto {
     private Boolean subscribe;
     private Boolean notification;
     private String profile_img;
+    private String token;
 
     public UserDto(String email, String username, String password) {
         this.email = email;
