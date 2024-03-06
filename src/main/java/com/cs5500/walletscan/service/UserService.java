@@ -1,12 +1,9 @@
 package com.cs5500.walletscan.service;
 
-import com.cs5500.walletscan.dto.LoginDto;
-import com.cs5500.walletscan.dto.UserDto;
-import com.cs5500.walletscan.entity.User;
-import com.cs5500.walletscan.responseModels.LoginResponse;
+import com.cs5500.walletscan.dto.ReqRes;
 
 public interface UserService {
-    User addUser(UserDto userDto);
+    ReqRes signUp(ReqRes signupRequest);
 
-    LoginResponse loginUser(LoginDto loginDto);
+    ReqRes signIn(ReqRes signinRequest);
 }

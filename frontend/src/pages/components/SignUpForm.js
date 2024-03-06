@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import styled, { keyframes } from "styled-components";
 import "../components/SignUpForm.css";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const move = keyframes`
@@ -248,49 +247,98 @@ function SignUpForm() {
   const [passwordLogin, setPasswordLogin] = useState("");
   const navigate = useNavigate();
 
-  async function onSignUpTapped(event) {
-    event.preventDefault();
+  const onSignUpTapped = async () => {
     try {
-      const baseUrl = process.env.REACT_APP_API;
-      await axios.post(`${baseUrl}/users/register`, {
-        email: email,
-        username: username,
-        password: password,
-      });
-      alert("User Registration Successfully. Please Sign In Now.");
-    } catch (error) {
-      console.log(error);
-    }
-  }
+      if (!username || !email || !password) {
+        alert("Please fill in all the required fields");
+        return;
+      }
 
-  async function onSignInTapped(event) {
-    event.preventDefault();
-    try {
       const baseUrl = process.env.REACT_APP_API;
-      await axios
-        .post(`${baseUrl}/users/signin`, {
+      const response = await fetch(`${baseUrl}/auth/signup`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: username,
+          email: email,
+          password: password,
+        }),
+      });
+
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      if (response.ok) {
+        alert(result.message);
+      } else {
+        handleAuthError(result);
+      }
+    } catch (error) {
+      alert("User doesn't exists", error.message);
+    }
+  };
+
+  const handleAuthError = (errorResult) => {
+    if (errorResult.statusCode === 400) {
+      // Handle validation errors
+      alert(`Validation Error: ${errorResult.error}`);
+    } else if (errorResult.statusCode === 500) {
+      // Handle server errors
+      alert(`Server Error: ${errorResult.error}`);
+    } else {
+      // Handle other errors
+      alert("Unexpected Error");
+    }
+  };
+
+  const onSignInTapped = async () => {
+    try {
+      if (!emailLogin || !passwordLogin) {
+        alert("Please fill in all the required fields");
+        return;
+      }
+      const url = `${process.env.REACT_APP_API}/auth/signin`;
+      console.log("URL:", url);
+      const requestOptions = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
           email: emailLogin,
           password: passwordLogin,
-        })
-        .then(
-          (res) => {
-            console.log(res.data);
-            if (res.data.message === "Email doesn't exist") {
-              alert("Email doesn't exist");
-            } else if (res.data.message === "Login Success") {
-              navigate("/home");
-            } else {
-              alert("Wrong Password. Please try again.");
-            }
-          },
-          (fail) => {
-            console.log(fail);
-          }
-        );
+        }),
+      };
+      const response = await fetch(url, requestOptions);
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      if (result.statusCode === 200) {
+        // Save the token to localStorage
+        localStorage.setItem("authToken", result.token);
+        alert(result.message);
+        navigate(-1);
+      } else if (result.statusCode === 400) {
+        // Handle validation errors
+        alert(`Validation Error: ${result.error}`);
+      } else if (result.statusCode === 500) {
+        // Handle server errors
+        alert(`Server Error: ${result.error}`);
+      } else {
+        // Handle other errors
+        alert("Unexpected Error");
+      }
     } catch (error) {
-      console.log(error);
+      alert("Error during sign-in:", error.message);
     }
-  }
+  };
 
   return (
     <>
@@ -303,7 +351,7 @@ function SignUpForm() {
           <Input
             type="email"
             name="email"
-            id="emailId"
+            id="emailLoginId"
             placeholder="Email"
             value={emailLogin}
             onChange={(event) => {
@@ -313,14 +361,14 @@ function SignUpForm() {
           <Input
             type="password"
             name="password"
-            id="passwordId"
+            id="passwordLoginId"
             placeholder="Password"
             value={passwordLogin}
             onChange={(event) => {
               setPasswordLogin(event.target.value);
             }}
           />
-          <Link href="#">Forgot Your Password?</Link>
+          <Link href="#" onClick={handleClick}>Don't have an account?</Link>
           <Button onClick={onSignInTapped}>Sign In</Button>
         </Form>
 
