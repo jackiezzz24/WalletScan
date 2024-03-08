@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "./Button";
 import "../../App.css";
-import "../components/Hero.css";
+import "../components/styles/Hero.css";
 
 function Hero() {
   return (
