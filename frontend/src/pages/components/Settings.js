@@ -11,6 +11,8 @@ function Settings() {
     notification: true,
   });
   const authToken = localStorage.getItem("authToken");
+  const [editingField, setEditingField] = useState(null);
+  const currencies = ["USD", "CAD", "CNY", "EUR", "GBP", "JPY"];
 
   const getUserProfile = async () => {
     try {
@@ -47,6 +49,32 @@ function Settings() {
     setUser((prevUser) => ({ ...prevUser, notification: checked }));
   };
 
+  const handleEditStart = (field) => {
+    setEditingField(field);
+  };
+
+  const handleEditSave = () => {
+    // Save the changes to the database
+    // You can use an API call here to update the user's data
+    setEditingField(null);
+  };
+
+  const handleEditCancel = () => {
+    // Cancel the edit mode
+    setEditingField(null);
+  };
+
+  const handleInputChange = (e) => {
+    setUser((prevUser) => ({
+      ...prevUser,
+      [editingField]: e.target.value,
+    }));
+  };
+
+  const handleCurrencyChange = (selectedCurrency) => {
+    setUser((prevUser) => ({ ...prevUser, currency: selectedCurrency }));
+  };
+
   return (
     <SettingsStyled>
       <InnerLayout>
@@ -54,11 +82,42 @@ function Settings() {
         <div className="user-settings">
           <div className="item">
             <h4>Budget</h4>
-            <p>{user?.budget || "0"}</p>
+            {editingField === "budget" ? (
+              <>
+                <input
+                  type="text"
+                  value={user.budget}
+                  onChange={handleInputChange}
+                  style={{ fontSize: '1.5rem' }}
+                />
+                <button onClick={handleEditSave} style={{ fontSize: '1.5rem' }}>Save</button>
+                <button onClick={handleEditCancel} style={{ fontSize: '1.5rem' }}>Cancel</button>
+              </>
+            ) : (
+              <p onClick={() => handleEditStart("budget")}>{parseInt(user.budget).toLocaleString()}</p>
+            )}
           </div>
           <div className="item">
             <h4>Currency</h4>
-            <p>{user?.currency || "USD"}</p>
+            {editingField === "currency" ? (
+              <>
+                <select
+                  value={user.currency}
+                  onChange={(e) => handleCurrencyChange(e.target.value)}
+                  style={{ fontSize: '1.5rem' }}
+                >
+                  {currencies.map((currency) => (
+                    <option key={currency} value={currency}>
+                      {currency}
+                    </option>
+                  ))}
+                </select>
+                <button onClick={handleEditSave} style={{ fontSize: '1.5rem' }}>Save</button>
+                <button onClick={handleEditCancel} style={{ fontSize: '1.5rem' }}>Cancel</button>
+              </>
+            ) : (
+              <p onClick={() => handleEditStart("currency")}>{user.currency}</p>
+            )}
           </div>
           <div className="item">
             <h4>Substribe Marketing Emails</h4>
