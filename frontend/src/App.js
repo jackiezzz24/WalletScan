@@ -5,7 +5,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import SignUp from "./pages/SignUp";
 import Dashboard from "./pages/Dashboard";
-import { TransactionProvider } from "./pages/components/Transactions";
+import { TransactionProvider } from "./pages/components/TransactionContext";
 
 function App() {
   return (

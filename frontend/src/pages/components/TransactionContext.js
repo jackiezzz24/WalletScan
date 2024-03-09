@@ -27,7 +27,7 @@ export const TransactionProvider = ({children}) => {
     }
 
     const deleteIncome = async (id) => {
-        const res  = await axios.delete(`${baseUrl}/delete-income/${id}`)
+        const res = await axios.delete(`${baseUrl}/delete-income/${id}`)
         getIncomes()
     }
 
@@ -41,7 +41,7 @@ export const TransactionProvider = ({children}) => {
     }
 
 
-    //calculate incomes
+    //calculate expenses
     const addExpense = async (income) => {
         const response = await axios.post(`${baseUrl}/add-expense`, income)
             .catch((err) =>{

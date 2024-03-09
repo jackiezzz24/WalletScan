@@ -29,3 +29,4 @@ export const tv = <i className="fa-solid fa-tv"></i>
 export const circle = <i className="fa-solid fa-circle-dot"></i>
 export const profile = <i class="fa-solid fa-user"></i>
 export const message = <i class="fa-solid fa-envelope"></i>
+export const image = <i class="fa-regular fa-image"></i>
