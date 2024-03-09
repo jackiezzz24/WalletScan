@@ -1,4 +1,4 @@
-import {profile, settings, message} from './Icons'
+import {profile, settings} from './Icons'
 
 export const rightItems = [
     {

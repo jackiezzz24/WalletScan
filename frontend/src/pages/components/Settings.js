@@ -43,12 +43,12 @@ function Settings() {
 
   const handleSubscribeToggle = async (checked) => {
     setUser((prevUser) => ({ ...prevUser, subscribe: checked }));
-    await saveToggleChanges('subscribe', checked);
+    await saveToggleChanges("subscribe", checked);
   };
 
   const handleNotificationToggle = async (checked) => {
     setUser((prevUser) => ({ ...prevUser, notification: checked }));
-    await saveToggleChanges('notification', checked);
+    await saveToggleChanges("notification", checked);
   };
 
   const saveToggleChanges = async (field, value) => {
@@ -59,9 +59,9 @@ function Settings() {
 
     const updateData = {
       budget: user.budget,
-    currency: user.currency,
-    subscribe: user.subscribe,
-    notification: user.notification,
+      currency: user.currency,
+      subscribe: user.subscribe,
+      notification: user.notification,
     };
 
     updateData[field] = value;
@@ -75,7 +75,7 @@ function Settings() {
         },
         body: JSON.stringify(updateData),
       });
-  
+
       if (!response.ok) {
         const result = await response.json();
         alert(`Failed to update profile: ${result.error}`);
@@ -91,7 +91,7 @@ function Settings() {
     setEditingField(field);
   };
 
-  const handleEditSave = async() => {
+  const handleEditSave = async () => {
     // Save the changes to the database
     const updateData = {
       budget: user.budget,
@@ -110,15 +110,15 @@ function Settings() {
         },
         body: JSON.stringify(updateData),
       });
-  
+
       if (!response.ok) {
         const result = await response.json();
         alert(`Failed to update profile: ${result.error}`);
         return;
       }
       alert("Profile updated successfully");
-      setEditingField(null); 
-      getUserProfile(); 
+      setEditingField(null);
+      getUserProfile();
     } catch (error) {
       alert("An error occurred during update: " + error.message);
     }
@@ -153,13 +153,22 @@ function Settings() {
                   type="text"
                   value={user.budget}
                   onChange={handleInputChange}
-                  style={{ fontSize: '1.5rem' }}
+                  style={{ fontSize: "1.5rem" }}
                 />
-                <button onClick={handleEditSave} style={{ fontSize: '1.5rem' }}>Save</button>
-                <button onClick={handleEditCancel} style={{ fontSize: '1.5rem' }}>Cancel</button>
+                <button onClick={handleEditSave} style={{ fontSize: "1.5rem" }}>
+                  Save
+                </button>
+                <button
+                  onClick={handleEditCancel}
+                  style={{ fontSize: "1.5rem" }}
+                >
+                  Cancel
+                </button>
               </>
             ) : (
-              <p onClick={() => handleEditStart("budget")}>{parseInt(user.budget).toLocaleString()}</p>
+              <p onClick={() => handleEditStart("budget")}>
+                {parseInt(user.budget).toLocaleString()}
+              </p>
             )}
           </div>
           <div className="item">
@@ -169,7 +178,7 @@ function Settings() {
                 <select
                   value={user.currency}
                   onChange={(e) => handleCurrencyChange(e.target.value)}
-                  style={{ fontSize: '1.5rem' }}
+                  style={{ fontSize: "1.5rem" }}
                 >
                   {currencies.map((currency) => (
                     <option key={currency} value={currency}>
@@ -177,8 +186,15 @@ function Settings() {
                     </option>
                   ))}
                 </select>
-                <button onClick={handleEditSave} style={{ fontSize: '1.5rem' }}>Save</button>
-                <button onClick={handleEditCancel} style={{ fontSize: '1.5rem' }}>Cancel</button>
+                <button onClick={handleEditSave} style={{ fontSize: "1.5rem" }}>
+                  Save
+                </button>
+                <button
+                  onClick={handleEditCancel}
+                  style={{ fontSize: "1.5rem" }}
+                >
+                  Cancel
+                </button>
               </>
             ) : (
               <p onClick={() => handleEditStart("currency")}>{user.currency}</p>

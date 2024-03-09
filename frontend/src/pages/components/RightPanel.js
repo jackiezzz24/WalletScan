@@ -4,7 +4,7 @@ import { rightItems } from "./utils/RightItems";
 import profile_image from "../../assets/images/profile_image.png";
 import { useProfileContext } from './ProfileContext';
 
-function RightPanel({ active, setActive }) {
+function RightPanel({ active, setActive, setShowForm }) {
 
   const [user, setUser] = useState(null);
   const authToken = localStorage.getItem('authToken');
@@ -66,7 +66,10 @@ function RightPanel({ active, setActive }) {
           );
         })}
       </ul>
-      <button className="button">
+      <button className="button" onClick={() => {
+        setActive(8);
+        setShowForm(true);
+      }}>
         <i className="fa-solid fa-plus" style={{ marginRight: "8px" }}></i>
         Add Transactions
       </button>
