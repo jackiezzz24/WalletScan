@@ -21,33 +21,28 @@ public class User implements UserDetails {
     @Column (nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String username;
 
     @Column(nullable = false)
     private String password;
 
-    @Column
+    @Column (nullable = false)
     private String budget;
 
-    @Column
+    @Column (nullable = false)
     private String currency;
 
-    @Column
+    @Column (nullable = false)
     private Boolean subscribe;
 
-    @Column
+    @Column (nullable = false)
     private Boolean notification;
 
     @Column
     private String profile_img;
 
     private static final String ROLE_TYPE = "REGULAR";
-
-    @Override
-    public String getUsername() {
-        return email;
-    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

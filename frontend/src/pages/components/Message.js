@@ -4,7 +4,7 @@ import { InnerLayout } from "./utils/Layout";
 import {useTransactionsContext} from "../components/Transactions";
 import { dollar } from "./utils/Icons";
 
-function DashboardForm() {
+function Messages() {
   const {
     totalExpenses,
     incomes,
@@ -21,9 +21,9 @@ function DashboardForm() {
   }, [getExpenses, getIncomes]);
 
   return (
-    <DashboardStyled>
+    <MessagesStyled>
       <InnerLayout>
-        <h1>All Transactions</h1>
+        <h1>Messagea</h1>
         <div className="stats-con">
           <div className="chart-con">
             {/* <Chart /> */}
@@ -67,11 +67,11 @@ function DashboardForm() {
           </div>
         </div>
       </InnerLayout>
-    </DashboardStyled>
+    </MessagesStyled>
   );
 }
 
-const DashboardStyled = styled.div`
+const MessagesStyled = styled.div`
   .stats-con {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -149,4 +149,4 @@ const DashboardStyled = styled.div`
   }
 `;
 
-export default DashboardForm;
+export default Messages;

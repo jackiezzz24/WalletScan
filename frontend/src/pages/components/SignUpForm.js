@@ -1,7 +1,193 @@
 import React, { useState } from "react";
 import styled, { keyframes } from "styled-components";
-import "../components/SignUpForm.css";
+import "../components/styles/SignUpForm.css";
 import { useNavigate } from "react-router-dom";
+
+function SignUpForm() {
+  const [click, setClick] = useState(true);
+  const handleClick = () => setClick(!click);
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [usernameLogin, setUsernameLogin] = useState("");
+  const [passwordLogin, setPasswordLogin] = useState("");
+  const navigate = useNavigate();
+
+  const onSignUpTapped = async (event) => {
+    event.preventDefault();
+    try {
+      if (!username || !email || !password) {
+        alert("Please fill in all the required fields");
+        return;
+      }
+
+      const baseUrl = process.env.REACT_APP_API;
+      const response = await fetch(`${baseUrl}/auth/signup`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: username,
+          email: email,
+          password: password,
+        }),
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        alert(result.message);
+        setClick(!click);
+      } else {
+        handleAuthError(result);
+      }
+    } catch (error) {
+      alert("An error occurred during signup: " + error.message);
+    }
+  };
+
+  const handleAuthError = (errorResult) => {
+    if (errorResult.statusCode === 400) {
+      // Handle validation errors
+      alert(`Validation Error: ${errorResult.error}`);
+    } else if (errorResult.statusCode === 500) {
+      // Handle server errors
+      alert(`Server Error: ${errorResult.error}`);
+    } else {
+      // Handle other errors
+      alert("Unexpected Error");
+    }
+  };
+
+  const onSignInTapped = async (event) => {
+    event.preventDefault();
+    try {
+      if (!usernameLogin || !passwordLogin) {
+        alert("Please fill in all the required fields");
+        return;
+      }
+      const url = `${process.env.REACT_APP_API}/auth/signin`;
+      console.log("URL:", url);
+      const requestOptions = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: usernameLogin,
+          password: passwordLogin,
+        }),
+      };
+      const response = await fetch(url, requestOptions);
+      const result = await response.json();
+      if (response.ok) {
+        // Save the token to localStorage
+        localStorage.setItem("authToken", result.token);
+        alert(result.message);
+        navigate("/dashboard");
+      } else {
+        handleAuthError(result);
+      }
+    } catch (error) {
+      alert("Error during sign-in:", error.message);
+    }
+  };
+
+  return (
+    <>
+      {" "}
+      <BackgroundBox clicked={click}>
+        <ButtonAnimate clicked={click} onClick={handleClick}></ButtonAnimate>
+
+        <Form className="signin">
+          <Title>Sign In</Title>
+          <Input
+            type="username"
+            name="username"
+            id="usernameLoginId"
+            placeholder="Username"
+            value={usernameLogin}
+            onChange={(event) => {
+              setUsernameLogin(event.target.value);
+            }}
+          />
+          <Input
+            type="password"
+            name="password"
+            id="passwordLoginId"
+            placeholder="Password"
+            value={passwordLogin}
+            onChange={(event) => {
+              setPasswordLogin(event.target.value);
+            }}
+          />
+          <Link href="#" onClick={handleClick}>
+            Don't have an account?
+          </Link>
+          <Button onClick={onSignInTapped}>Sign In</Button>
+        </Form>
+
+        <Form className="signup">
+          <Title>Sign Up</Title>
+          <Input
+            type="text"
+            name="username"
+            id="usernameId"
+            placeholder="Username"
+            value={username}
+            onChange={(event) => {
+              setUsername(event.target.value);
+            }}
+          />
+
+          <Input
+            type="email"
+            name="email"
+            id="emailId"
+            placeholder="Email"
+            value={email}
+            onChange={(event) => {
+              setEmail(event.target.value);
+            }}
+          />
+          <Input
+            type="password"
+            name="password"
+            id="passwordId"
+            placeholder="Password"
+            value={password}
+            onChange={(event) => {
+              setPassword(event.target.value);
+            }}
+          />
+          <Link href="#" onClick={handleClick}>
+            Already have an Account?
+          </Link>
+          <Button onClick={onSignUpTapped}>Sign Up</Button>
+        </Form>
+
+        <Text className="text1" clicked={click}>
+          <h1>Welcome!</h1>
+          Don't have an account?
+          <br />
+          <span className="attention">Click Here !</span>
+          <span className="attention-icon">⤶</span>
+        </Text>
+
+        <Text className="text2" clicked={click}>
+          <h1>Hi There!</h1>
+          Already have an account?
+          <br />
+          <span className="attention">Click Here !</span>
+          <span className="attention-icon">⤷</span>
+        </Text>
+
+        <Box1 clicked={click} />
+        <Box2 clicked={click} />
+      </BackgroundBox>
+    </>
+  );
+}
 
 const move = keyframes`
 0%{
@@ -19,7 +205,6 @@ const BackgroundBox = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-
   margin: 15vh auto;
 
   position: relative;
@@ -236,202 +421,5 @@ const Text = styled.div`
     font-size: 2vw;
   }
 `;
-
-function SignUpForm() {
-  const [click, setClick] = useState(false);
-  const handleClick = () => setClick(!click);
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [emailLogin, setEmailLogin] = useState("");
-  const [passwordLogin, setPasswordLogin] = useState("");
-  const navigate = useNavigate();
-
-  const onSignUpTapped = async () => {
-    try {
-      if (!username || !email || !password) {
-        alert("Please fill in all the required fields");
-        return;
-      }
-
-      const baseUrl = process.env.REACT_APP_API;
-      const response = await fetch(`${baseUrl}/auth/signup`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: username,
-          email: email,
-          password: password,
-        }),
-      });
-
-      const result = await response.json();
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      if (response.ok) {
-        alert(result.message);
-      } else {
-        handleAuthError(result);
-      }
-    } catch (error) {
-      alert("User doesn't exists", error.message);
-    }
-  };
-
-  const handleAuthError = (errorResult) => {
-    if (errorResult.statusCode === 400) {
-      // Handle validation errors
-      alert(`Validation Error: ${errorResult.error}`);
-    } else if (errorResult.statusCode === 500) {
-      // Handle server errors
-      alert(`Server Error: ${errorResult.error}`);
-    } else {
-      // Handle other errors
-      alert("Unexpected Error");
-    }
-  };
-
-  const onSignInTapped = async () => {
-    try {
-      if (!emailLogin || !passwordLogin) {
-        alert("Please fill in all the required fields");
-        return;
-      }
-      const url = `${process.env.REACT_APP_API}/auth/signin`;
-      console.log("URL:", url);
-      const requestOptions = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: emailLogin,
-          password: passwordLogin,
-        }),
-      };
-      const response = await fetch(url, requestOptions);
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      const result = await response.json();
-
-      if (result.statusCode === 200) {
-        // Save the token to localStorage
-        localStorage.setItem("authToken", result.token);
-        alert(result.message);
-        navigate(-1);
-      } else if (result.statusCode === 400) {
-        // Handle validation errors
-        alert(`Validation Error: ${result.error}`);
-      } else if (result.statusCode === 500) {
-        // Handle server errors
-        alert(`Server Error: ${result.error}`);
-      } else {
-        // Handle other errors
-        alert("Unexpected Error");
-      }
-    } catch (error) {
-      alert("Error during sign-in:", error.message);
-    }
-  };
-
-  return (
-    <>
-      {" "}
-      <BackgroundBox clicked={click}>
-        <ButtonAnimate clicked={click} onClick={handleClick}></ButtonAnimate>
-
-        <Form className="signin">
-          <Title>Sign In</Title>
-          <Input
-            type="email"
-            name="email"
-            id="emailLoginId"
-            placeholder="Email"
-            value={emailLogin}
-            onChange={(event) => {
-              setEmailLogin(event.target.value);
-            }}
-          />
-          <Input
-            type="password"
-            name="password"
-            id="passwordLoginId"
-            placeholder="Password"
-            value={passwordLogin}
-            onChange={(event) => {
-              setPasswordLogin(event.target.value);
-            }}
-          />
-          <Link href="#" onClick={handleClick}>Don't have an account?</Link>
-          <Button onClick={onSignInTapped}>Sign In</Button>
-        </Form>
-
-        <Form className="signup">
-          <Title>Sign Up</Title>
-          <Input
-            type="text"
-            name="username"
-            id="usernameId"
-            placeholder="Username"
-            value={username}
-            onChange={(event) => {
-              setUsername(event.target.value);
-            }}
-          />
-
-          <Input
-            type="email"
-            name="email"
-            id="emailId"
-            placeholder="Email"
-            value={email}
-            onChange={(event) => {
-              setEmail(event.target.value);
-            }}
-          />
-          <Input
-            type="password"
-            name="password"
-            id="passwordId"
-            placeholder="Password"
-            value={password}
-            onChange={(event) => {
-              setPassword(event.target.value);
-            }}
-          />
-          <Link href="#" onClick={handleClick}>
-            Already have an Account?
-          </Link>
-          <Button onClick={onSignUpTapped}>Sign Up</Button>
-        </Form>
-
-        <Text className="text1" clicked={click}>
-          <h1>Welcome!</h1>
-          Don't have an account?
-          <br />
-          <span className="attention">Click Here !</span>
-          <span className="attention-icon">⤶</span>
-        </Text>
-
-        <Text className="text2" clicked={click}>
-          <h1>Hi There!</h1>
-          Already have an account?
-          <br />
-          <span className="attention">Click Here !</span>
-          <span className="attention-icon">⤷</span>
-        </Text>
-
-        <Box1 clicked={click} />
-        <Box2 clicked={click} />
-      </BackgroundBox>
-    </>
-  );
-}
 
 export default SignUpForm;

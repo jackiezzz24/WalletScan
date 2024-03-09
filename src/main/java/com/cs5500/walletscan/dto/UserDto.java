@@ -16,16 +16,4 @@ public class UserDto {
     private Boolean subscribe;
     private Boolean notification;
     private String profile_img;
-    private String token;
-
-    public UserDto(String email, String username, String password) {
-        this.email = email;
-        this.username = username;
-        this.password = password;
-        this.budget = "0";
-        this.currency = "USD";
-        this.subscribe = true;
-        this.notification = true;
-        this.profile_img = "";
-    }
 }

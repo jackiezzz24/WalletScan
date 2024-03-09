@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "./Button";
 import { Link, useNavigate } from "react-router-dom";
-import "./Navbar.css";
+import "./styles/Navbar.css";
 
 function Navbar() {
   const [click, setClick] = useState(false);
@@ -24,12 +24,15 @@ function Navbar() {
   }, []);
 
   useEffect(() => {
-    setIsAuthenticated(!!localStorage.getItem("authToken"));
-  }, []);
+    const authToken = localStorage.getItem("authToken");
+    setIsAuthenticated(!!authToken);
+  }, [localStorage.getItem("authToken")]);
+  
 
   window.addEventListener("resize", showButton);
 
-  const handleLogout = () => {
+  const handleLogout = (event) => {
+    event.preventDefault();
     localStorage.removeItem("authToken");
     alert("User Logout");
     navigate("/");
@@ -99,9 +102,9 @@ function Navbar() {
           {button && (
             <Button
               buttonStyle="btn--outline"
-              onClick={() => {
+              onClick={(event) => {
                 if (isAuthenticated) {
-                  handleLogout();
+                  handleLogout(event);
                 }
               }}
             >

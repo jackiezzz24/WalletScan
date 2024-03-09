@@ -5,19 +5,20 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import SignUp from "./pages/SignUp";
 import Dashboard from "./pages/Dashboard";
+import { TransactionProvider } from "./pages/components/Transactions";
 
 function App() {
   return (
-    <>
-      <Router>
-        <Navbar />
-        <Routes>
-          <Route path="/" exact element={<Home />}></Route>
-          <Route path="/register" exact element={<SignUp />}></Route>
-          <Route path="/dashboard" exact element={<Dashboard />}></Route>
-        </Routes>
-      </Router>
-    </>
+    <TransactionProvider>
+    <Router>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/register" element={<SignUp />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+      </Routes>
+    </Router>
+  </TransactionProvider>
   );
 }
 

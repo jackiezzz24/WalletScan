@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ReqRes {
+public class ResponseDto {
 
     private int statusCode;
     private String error;
