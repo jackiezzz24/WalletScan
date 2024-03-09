@@ -10,6 +10,7 @@ import LeftPanel from "./components/LeftPanel";
 import RightPanel from "./components/RightPanel";
 import Profile from "./components/Profile";
 import Settings from "./components/Settings";
+import { ProfileProvider } from "./components/ProfileContext";
 
 function Dashboard() {
   const [active, setActive] = useState(false);
@@ -47,8 +48,10 @@ function Dashboard() {
       {orbMemo}
       <MainLayout>
         <LeftPanel active={active} setActive={setActive} />
-        <main>{displayData()}</main>
-        <RightPanel active={active} setActive={setActive} />
+        <ProfileProvider>
+          <main>{displayData()}</main>
+          <RightPanel active={active} setActive={setActive} />
+        </ProfileProvider>
       </MainLayout>
     </DashboardStyled>
   );

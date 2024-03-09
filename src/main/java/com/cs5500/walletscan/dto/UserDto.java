@@ -16,5 +16,4 @@ public class UserDto {
     private Boolean subscribe;
     private Boolean notification;
     private String profile_img;
-    private String token;
 }

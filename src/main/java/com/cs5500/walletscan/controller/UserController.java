@@ -1,6 +1,7 @@
 package com.cs5500.walletscan.controller;
 
 import com.cs5500.walletscan.dto.ResponseDto;
+import com.cs5500.walletscan.dto.UserDto;
 import com.cs5500.walletscan.entity.User;
 import com.cs5500.walletscan.repository.UserRepository;
 import com.cs5500.walletscan.service.UserService;
@@ -68,4 +69,27 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
+    @PutMapping("/update/{userId}")
+    public ResponseEntity<ResponseDto> updateUser(@PathVariable Long userId, @RequestBody UserDto userDto) {
+        ResponseDto response = userService.updateUserSettings(userId, userDto);
+        HttpStatus httpStatus = switch (response.getStatusCode()) {
+            case 200 -> HttpStatus.OK;
+            case 400 -> HttpStatus.BAD_REQUEST;
+            case 404 -> HttpStatus.NOT_FOUND;
+            default -> HttpStatus.INTERNAL_SERVER_ERROR;
+        };
+        return new ResponseEntity<>(response, httpStatus);
+    }
+
+    @PutMapping("/upload/{userId}")
+    public ResponseEntity<ResponseDto> updateProfileImage(@PathVariable Long userId, @RequestBody UserDto userDto) {
+        ResponseDto response = userService.updateProfileImage(userId, userDto);
+        HttpStatus httpStatus = switch (response.getStatusCode()) {
+            case 200 -> HttpStatus.OK;
+            case 400 -> HttpStatus.BAD_REQUEST;
+            case 404 -> HttpStatus.NOT_FOUND;
+            default -> HttpStatus.INTERNAL_SERVER_ERROR;
+        };
+        return new ResponseEntity<>(response, httpStatus);
+    }
 }

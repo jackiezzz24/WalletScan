@@ -3,6 +3,7 @@ package com.cs5500.walletscan.service.impl;
 import com.cs5500.walletscan.Utils.JWTUtils;
 import com.cs5500.walletscan.Utils.ValidationUtils;
 import com.cs5500.walletscan.dto.ResponseDto;
+import com.cs5500.walletscan.dto.UserDto;
 import com.cs5500.walletscan.entity.User;
 import com.cs5500.walletscan.repository.UserRepository;
 import com.cs5500.walletscan.service.SubscribeService;
@@ -37,14 +38,14 @@ public class UserServiceImpl implements UserService {
             String password = signupRequest.getPassword();
 
             // Add email validation
-            if (!ValidationUtils.isValidEmail(email)) {
+            if (!validationUtils.isValidEmail(email)) {
                 response.setStatusCode(400);
                 response.setError("Invalid email format");
                 return response;
             }
 
             // Add password length validation
-            if (!ValidationUtils.isValidPassword(password)) {
+            if (validationUtils.isValidPassword(password)) {
                 response.setStatusCode(400);
                 response.setError("Password must be more than 6 characters");
                 return response;
@@ -81,7 +82,7 @@ public class UserServiceImpl implements UserService {
             String username = signinRequest.getUsername();
 
             // Add password length validation
-            if (!ValidationUtils.isValidPassword(password)) {
+            if (validationUtils.isValidPassword(password)) {
                 response.setStatusCode(400);
                 response.setError("Password must be more than 6 characters");
                 return response;
@@ -95,6 +96,57 @@ public class UserServiceImpl implements UserService {
             response.setExpirationTime("24Hr");
             response.setMessage("Successfully Signed In");
         } catch (Exception e){
+            response.setStatusCode(500);
+            response.setError(e.getMessage());
+        }
+        return response;
+    }
+
+    @Override
+    public ResponseDto updateUserSettings(Long userId, UserDto userDto) {
+        ResponseDto response = new ResponseDto();
+        try {
+            User existingUser = userRepository.findById(userId).orElse(null);
+
+            if (existingUser != null) {
+                existingUser.setBudget(userDto.getBudget());
+                existingUser.setCurrency(userDto.getCurrency());
+                existingUser.setSubscribe(userDto.getSubscribe());
+                existingUser.setNotification(userDto.getNotification());
+
+                User savedUser = userRepository.save(existingUser);
+                response.setUser(savedUser);
+                response.setMessage("User Updated Successfully");
+                response.setStatusCode(200);
+            } else {
+                response.setStatusCode(404);
+                response.setError("User Not Found");
+            }
+        } catch (Exception e) {
+            response.setStatusCode(500);
+            response.setError(e.getMessage());
+        }
+        return response;
+    }
+
+    @Override
+    public ResponseDto updateProfileImage(Long userId, UserDto userDto) {
+        ResponseDto response = new ResponseDto();
+        try {
+            User existingUser = userRepository.findById(userId).orElse(null);
+
+            if (existingUser != null) {
+                existingUser.setProfile_img(userDto.getProfile_img());
+
+                User savedUser = userRepository.save(existingUser);
+                response.setUser(savedUser);
+                response.setMessage("Profile Image Upload Successfully");
+                response.setStatusCode(200);
+            } else {
+                response.setStatusCode(404);
+                response.setError("User Not Found");
+            }
+        } catch (Exception e) {
             response.setStatusCode(500);
             response.setError(e.getMessage());
         }

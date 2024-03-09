@@ -13,10 +13,10 @@ function Settings() {
   const authToken = localStorage.getItem("authToken");
   const [editingField, setEditingField] = useState(null);
   const currencies = ["USD", "CAD", "CNY", "EUR", "GBP", "JPY"];
+  const baseUrl = process.env.REACT_APP_API;
 
   const getUserProfile = async () => {
     try {
-      const baseUrl = process.env.REACT_APP_API;
       const response = await fetch(`${baseUrl}/auth/profile`, {
         method: "GET",
         headers: {
@@ -41,22 +41,87 @@ function Settings() {
     getUserProfile();
   }, []);
 
-  const handleSubscribeToggle = (checked) => {
+  const handleSubscribeToggle = async (checked) => {
     setUser((prevUser) => ({ ...prevUser, subscribe: checked }));
+    await saveToggleChanges('subscribe', checked);
   };
 
-  const handleNotificationToggle = (checked) => {
+  const handleNotificationToggle = async (checked) => {
     setUser((prevUser) => ({ ...prevUser, notification: checked }));
+    await saveToggleChanges('notification', checked);
+  };
+
+  const saveToggleChanges = async (field, value) => {
+    if (value === user[field]) {
+      alert("No changes detected");
+      return;
+    }
+
+    const updateData = {
+      budget: user.budget,
+    currency: user.currency,
+    subscribe: user.subscribe,
+    notification: user.notification,
+    };
+
+    updateData[field] = value;
+
+    try {
+      const response = await fetch(`${baseUrl}/auth/update/${user.id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updateData),
+      });
+  
+      if (!response.ok) {
+        const result = await response.json();
+        alert(`Failed to update profile: ${result.error}`);
+      } else {
+        alert("Profile updated successfully");
+      }
+    } catch (error) {
+      alert("An error occurred during update: " + error.message);
+    }
   };
 
   const handleEditStart = (field) => {
     setEditingField(field);
   };
 
-  const handleEditSave = () => {
+  const handleEditSave = async() => {
     // Save the changes to the database
-    // You can use an API call here to update the user's data
-    setEditingField(null);
+    const updateData = {
+      budget: user.budget,
+      currency: user.currency,
+      subscribe: user.subscribe,
+      notification: user.notification,
+    };
+
+    try {
+      const baseUrl = process.env.REACT_APP_API;
+      const response = await fetch(`${baseUrl}/auth/update/${user.id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updateData),
+      });
+  
+      if (!response.ok) {
+        const result = await response.json();
+        alert(`Failed to update profile: ${result.error}`);
+        return;
+      }
+      alert("Profile updated successfully");
+      setEditingField(null); 
+      getUserProfile(); 
+    } catch (error) {
+      alert("An error occurred during update: " + error.message);
+    }
   };
 
   const handleEditCancel = () => {

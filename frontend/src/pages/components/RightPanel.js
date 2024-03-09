@@ -2,11 +2,13 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { rightItems } from "./utils/RightItems";
 import profile_image from "../../assets/images/profile_image.png";
+import { useProfileContext } from './ProfileContext';
 
 function RightPanel({ active, setActive }) {
 
   const [user, setUser] = useState(null);
   const authToken = localStorage.getItem('authToken');
+  const { profileImageUrl  } = useProfileContext();
 
   const getUserProfile = async () => {
     try {
@@ -35,10 +37,17 @@ function RightPanel({ active, setActive }) {
     getUserProfile();
   },[]);
 
+  useEffect(() => {
+    setUser((prevUser) => ({
+      ...prevUser,
+      profile_img: profileImageUrl,
+    }));
+  }, [profileImageUrl]);
+
   return (
     <RightPanelStyled>
       <div className="user-con">
-        <img src={profile_image} alt="" />
+        <img src={user?.profile_img || profile_image} alt="" />
       </div>
       <div className="text">
         <h2>Welcome {user?.username || 'Guest'}!</h2>

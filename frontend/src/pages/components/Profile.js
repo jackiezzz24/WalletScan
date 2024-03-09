@@ -6,6 +6,7 @@ import Avatar from "react-avatar-edit";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
+import { useProfileContext } from './ProfileContext';
 
 function Profile() {
   const [user, setUser] = useState(null);
@@ -15,6 +16,7 @@ function Profile() {
   const [src, setSrc] = useState(false);
   const [pview, setPview] = useState(false);
   const [profile, setProfile] = useState([]);
+  const { updateProfileImage } = useProfileContext();
 
   const profileFinal = profile.map((item) => item.pview);
 
@@ -53,9 +55,65 @@ function Profile() {
     setPview(view);
   };
 
-  const saveCropImage = () => {
-    setProfile([...profile, { pview }]);
-    setImageCrop(false);
+  const saveCropImage = async () => {
+    try {
+      const imageUrl = await uploadImageToCloudinary();
+      updateProfileImage(imageUrl);
+      const baseUrl = process.env.REACT_APP_API;
+      const response = await fetch(`${baseUrl}/auth/upload/${user.id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ profile_img: imageUrl }),
+      });
+
+      if (!response.ok) {
+        const result = await response.json();
+        alert(`Failed to upload profile image: ${result.error}`);
+        return;
+      }
+      alert("Profile image upload successfully");
+      getUserProfile();
+      setImageCrop(false);
+    } catch (error) {
+      alert("An error occurred during update: " + error.message);
+    }
+  };
+
+  const uploadImageToCloudinary = async () => {
+    if (pview) {
+      const formData = new FormData();
+      formData.append("file", pview);
+      formData.append("upload_preset", "ml_default");
+
+      try {
+        const cloudinaryResponse = await fetch(
+          `https://api.cloudinary.com/v1_1/dxhu2wrmc/image/upload`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+
+        if (cloudinaryResponse.ok) {
+          const cloudinaryResult = await cloudinaryResponse.json();
+          return cloudinaryResult.secure_url;
+        } else {
+          const cloudinaryResult = await cloudinaryResponse.json();
+          throw new Error(
+            `Cloudinary upload error: ${cloudinaryResult.error.message}`
+          );
+        }
+      } catch (error) {
+        throw new Error(
+          `Error uploading image to Cloudinary: ${error.message}`
+        );
+      }
+    } else {
+      throw new Error("No image selected for upload.");
+    }
   };
 
   return (
@@ -64,7 +122,11 @@ function Profile() {
         <h1>Profile</h1>
         <div className="user-con">
           <img
-            src={profileFinal.length ? profileFinal : profile_image}
+            src={
+              profileFinal.length
+                ? profileFinal
+                : user?.profile_img || profile_image
+            }
             alt=""
             onClick={() => {
               setImageCrop(true);
@@ -74,7 +136,11 @@ function Profile() {
             visible={imageCrop}
             header={() => <CustomDialogTitle>Update Profile</CustomDialogTitle>}
             onHide={() => setImageCrop(false)}
-            style={{ background: 'rgba(180, 240, 201, 1)', borderRadius:'5%' , padding: '1rem'}}
+            style={{
+              background: "rgba(180, 240, 201, 1)",
+              borderRadius: "5%",
+              padding: "1rem",
+            }}
           >
             <div className="confirmation-content flex flex-column align-items-center">
               <Avatar
@@ -89,12 +155,13 @@ function Profile() {
               <div className="flex flex-column align-items-center mt-5 w-12">
                 <div className="flex justify-content-around w-12 mt-4">
                   <ButtonStyled>
-                  <Button className="save-button"
-                    onClick={saveCropImage}
-                    label="Save"
-                    icon="pi pi-check"
-                    style={{ fontSize: '1.5rem' }}
-                  />
+                    <Button
+                      className="save-button"
+                      onClick={saveCropImage}
+                      label="Save"
+                      icon="pi pi-check"
+                      style={{ fontSize: "1.5rem" }}
+                    />
                   </ButtonStyled>
                 </div>
               </div>
