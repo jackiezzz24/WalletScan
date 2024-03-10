@@ -20,4 +20,5 @@ public class TransactionsDto {
     private String currency;
     private Long userid;
     private String receipt_img;
+    private String description;
 }

@@ -5,12 +5,13 @@ import { InnerLayout } from "./utils/Layout";
 import IncomeItem from "./utils/IncomeItem";
 
 function Income() {
-  const { addIncome, incomes, getIncomes, deleteIncome, totalIncome } =
+  const { incomes, getIncomes, deleteIncome, totalIncome } =
     useTransactionsContext();
 
   useEffect(() => {
     getIncomes();
   }, []);
+  
   return (
     <IncomeStyled>
       <InnerLayout>

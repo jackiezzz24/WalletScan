@@ -8,7 +8,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import receipt_image from "../../../assets/images/default-image.jpg";
 
 function Form() {
-  const { addIncome, addExpense, error, setError } = useTransactionsContext();
+  const { addTrans, error, setError } = useTransactionsContext();
   const [user, setUser] = useState(null);
   const authToken = localStorage.getItem("authToken");
 
@@ -20,6 +20,7 @@ function Form() {
     date: "",
     category: "",
     description: "",
+    userid: "",
     receipt_img: "",
   });
   const currencies = ["USD", "CAD", "CNY", "EUR", "GBP", "JPY"];
@@ -27,15 +28,15 @@ function Form() {
     "Education",
     "Groceries",
     "Medical",
-    "Subscriptions",
-    "Takeaways",
-    "Clothing",
+    "Rent",
+    "Restaurant",
+    "Retail",
     "Travel",
     "Other",
   ];
   const incomeCategories = [
     "Salary",
-    "Investiment",
+    "Investment",
     "Stock",
     "Bitcoin",
     "Bank",
@@ -57,8 +58,8 @@ function Form() {
 
       const result = await response.json();
       if (response.ok) {
-        const { username } = result;
-        setUser({ ...result, username });
+        const { username, id } = result;
+        setUser({ ...result, username, id });
       } else {
         alert(`${result.error}`);
       }
@@ -79,6 +80,7 @@ function Form() {
     date,
     category,
     description,
+    userid,
     receipt_img,
   } = inputState;
 
@@ -96,10 +98,18 @@ function Form() {
     setError("");
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!user) {
+      console.error("User object is not available");
+      return;
+    }
+
+    setInputState({ ...inputState, userid: user.id });
+
     if (expenses) {
-      addExpense(inputState);
+      addTrans(inputState);
       setInputState({
         merchant: "",
         amount: "",
@@ -108,10 +118,11 @@ function Form() {
         date: "",
         category: "",
         description: "",
+        userid: "",
         receipt_img: "",
       });
     } else {
-      addIncome(inputState);
+      addTrans(inputState);
       setInputState({
         merchant: "",
         amount: "",
@@ -120,8 +131,43 @@ function Form() {
         date: "",
         category: "",
         description: "",
+        userid: "",
         receipt_img: "",
       });
+    }
+  };
+
+  const uploadImageToCloudinary = async () => {
+    if (image) {
+      const formData = new FormData();
+      formData.append("file", image);
+      formData.append("upload_preset", "ml_default");
+
+      try {
+        const cloudinaryResponse = await fetch(
+          `https://api.cloudinary.com/v1_1/dxhu2wrmc/image/upload`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+
+        if (cloudinaryResponse.ok) {
+          const cloudinaryResult = await cloudinaryResponse.json();
+          return cloudinaryResult.secure_url;
+        } else {
+          const cloudinaryResult = await cloudinaryResponse.json();
+          throw new Error(
+            `Cloudinary upload error: ${cloudinaryResult.error.message}`
+          );
+        }
+      } catch (error) {
+        throw new Error(
+          `Error uploading image to Cloudinary: ${error.message}`
+        );
+      }
+    } else {
+      throw new Error("No image selected for upload.");
     }
   };
 
@@ -150,7 +196,6 @@ function Form() {
         <div className="selects input-control">
           <p>Currency</p>
           <select
-            required
             value={currency}
             name="currency"
             id="currency"
@@ -181,7 +226,6 @@ function Form() {
         <div className="selects input-control">
           <p>Transaction Type</p>
           <select
-            required
             value={expenses}
             name="expenses"
             id="expenses"
@@ -197,7 +241,6 @@ function Form() {
         <div className="selects input-control">
           <p>Category</p>
           <select
-            required
             value={category}
             name="category"
             id="category"
@@ -287,6 +330,7 @@ const FormStyled = styled.form`
 
   .inputItem {
     margin-left: -2rem;
+    margin-right: 2rem;
     .input-control {
       margin-top: 1.2rem;
       input {

@@ -5,7 +5,7 @@ import { InnerLayout } from "./utils/Layout";
 import IncomeItem from "./utils/IncomeItem";
 
 function Expenses() {
-  const { addIncome, expenses, getExpenses, deleteExpense, totalExpenses } =
+  const { expenses, getExpenses, deleteExpense, totalExpenses } =
     useTransactionsContext();
 
   useEffect(() => {

@@ -1,5 +1,6 @@
 package com.cs5500.walletscan.dto;
 
+import com.cs5500.walletscan.entity.Transaction;
 import com.cs5500.walletscan.entity.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -19,4 +20,5 @@ public class ResponseDto {
     private String email;
     private String password;
     private User user;
+    private Transaction transaction;
 }

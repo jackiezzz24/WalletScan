@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { InnerLayout } from "./utils/Layout";
 import { useTransactionsContext } from "./TransactionContext";
 import { dollar } from "./utils/Icons";
-import Chart from "./Chart";
+import Chart from "./LineGraph";
 import Pie from "./Pie";
 
 function CategoryForm() {

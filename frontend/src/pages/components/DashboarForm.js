@@ -3,8 +3,8 @@ import styled from "styled-components";
 import { InnerLayout } from "./utils/Layout";
 import { useTransactionsContext } from "./TransactionContext";
 import { dollar } from "./utils/Icons";
-import Chart from "./Chart";
-import Pie from "./Pie";
+import Chart from "./LineGraph";
+import PieChart from "./Pie";
 
 function DashboardForm() {
   const { totalExpenses, totalIncome, totalBalance, getIncomes, getExpenses } =
@@ -13,7 +13,14 @@ function DashboardForm() {
   useEffect(() => {
     getIncomes();
     getExpenses();
-  }, [getExpenses, getIncomes]);
+  }, []);
+
+  const formatAmount = (amount) => {
+    return parseFloat(amount).toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  };
 
   return (
     <DashboardStyled>
@@ -24,13 +31,13 @@ function DashboardForm() {
             <div className="income">
               <h2>Total Income</h2>
               <p>
-                {dollar} {totalIncome()}
+                {dollar} {formatAmount(totalIncome())}
               </p>
             </div>
             <div className="expense">
               <h2>Total Expense</h2>
               <p>
-                {dollar} {totalExpenses()}
+                {dollar} {formatAmount(totalExpenses())}
               </p>
             </div>
             <div className="balance">
@@ -48,7 +55,7 @@ function DashboardForm() {
           </div>
           <div className="chart">
             <p>Spend Details</p>
-            <Pie />
+            <PieChart />
           </div>
         </div>
       </InnerLayout>
@@ -62,13 +69,13 @@ const DashboardStyled = styled.div`
   }
 
   .chart-con {
-    margin-top: 6rem;
+    margin-top: 5rem;
     display: flex;
-    gap: 5rem;
+    gap: 3rem;
 
     .chart {
-      height: 250px;
-      width: 400px;
+      height: 300px;
+      width: 450px;
       flex-direction: column;
     }
 
@@ -86,7 +93,7 @@ const DashboardStyled = styled.div`
 
     .amount-con {
       display: flex;
-      gap: 4rem;
+      gap: 2rem;
       flex-direction: row;
       margin-top: 2rem;
 
@@ -97,13 +104,13 @@ const DashboardStyled = styled.div`
         border: 2px solid #ffffff;
         box-shadow: 0px 1px 15px rgba(0, 0, 0, 0.06);
         border-radius: 20px;
-        padding: 1rem 4rem;
+        padding: 1rem 2rem;
         justify-content: center;
         align-items: center;
         display: flex;
         flex-direction: column;
         p {
-          font-size: 3.5rem;
+          font-size: 3rem;
           font-weight: 500;
         }
       }
