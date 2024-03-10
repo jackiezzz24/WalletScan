@@ -34,4 +34,6 @@ public class Transaction {
     private Long userid;
     @Column
     private String receipt_img;
+    @Column
+    private String description;
 }

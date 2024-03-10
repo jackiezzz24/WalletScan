@@ -1,112 +1,193 @@
-import React, { useContext, useState } from "react"
-import axios from 'axios'
+import React, { useContext, useState, useEffect } from "react";
+import axios from "axios";
 
 const baseUrl = process.env.REACT_APP_API;
+const TransactionsContext = React.createContext();
 
-const TransactionsContext = React.createContext()
+export const TransactionProvider = ({ children }) => {
+  const [incomes, setIncomes] = useState([]);
+  const [expenses, setExpenses] = useState([]);
+  const [error, setError] = useState(null);
+  const [user, setUser] = useState(null);
+  const authToken = localStorage.getItem("authToken");
 
-export const TransactionProvider = ({children}) => {
+  const getUserProfile = async () => {
+    try {
+      const baseUrl = process.env.REACT_APP_API;
+      const response = await fetch(`${baseUrl}/auth/profile`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          "Content-Type": "application/json",
+        },
+      });
 
-    const [incomes, setIncomes] = useState([])
-    const [expenses, setExpenses] = useState([])
-    const [error, setError] = useState(null)
-
-    //calculate incomes
-    const addIncome = async (income) => {
-        const response = await axios.post(`${baseUrl}/add-income`, income)
-            .catch((err) =>{
-                setError(err.response.data.message)
-            })
-        getIncomes()
+      const result = await response.json();
+      if (response.ok) {
+        const { username, id } = result;
+        setUser({ ...result, username, id });
+      } else {
+        alert(`${result.error}`);
+      }
+    } catch (error) {
+      alert("An error occurred during fetch: " + error.message);
     }
+  };
 
-    const getIncomes = async () => {
-        const response = await axios.get(`${baseUrl}/get-incomes`)
-        setIncomes(response.data)
-        console.log(response.data)
+  useEffect(() => {
+    getUserProfile();
+  }, []);
+
+  const addTrans = async (input) => {
+    try {
+      const response = await fetch(`${baseUrl}/transaction/${user.id}/add`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(input),
+      });
+
+      if (!response.ok) {
+        const result = await response.json();
+        alert(`Failed to add transaction: ${result.error}`);
+        return;
+      }
+      alert("Transaction added successfully");
+    } catch (error) {
+      alert("An error occurred: " + error.message);
     }
+  };
 
-    const deleteIncome = async (id) => {
-        const res = await axios.delete(`${baseUrl}/delete-income/${id}`)
-        getIncomes()
+  const getIncomes = async () => {
+    try {
+      const response = await fetch(
+        `${baseUrl}/transaction/incomes/${user.id}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const result = await response.json();
+        alert(`Failed to get incomes: ${result.error}`);
+        return;
+      }
+      const data = await response.json();
+      setIncomes(data);
+      console.log(data);
+    } catch (error) {
+      alert("An error occurred: " + error.message);
     }
+  };
 
-    const totalIncome = () => {
-        let totalIncome = 0;
-        incomes.forEach((income) =>{
-            totalIncome = totalIncome + income.amount
-        })
+  const getExpenses = async () => {
+    try {
+      const response = await fetch(
+        `${baseUrl}/transaction/expenses/${user.id}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-        return totalIncome;
+      if (!response.ok) {
+        const result = await response.json();
+        alert(`Failed to get expenses: ${result.error}`);
+        return;
+      }
+      const data = await response.json();
+      setExpenses(data);
+      console.log(data);
+    } catch (error) {
+      alert("An error occurred: " + error.message);
     }
+  };
 
+  const deleteIncome = async (id) => {
+    const res = await axios.delete(`${baseUrl}/delete-income/${id}`);
+    getIncomes();
+  };
 
-    //calculate expenses
-    const addExpense = async (income) => {
-        const response = await axios.post(`${baseUrl}/add-expense`, income)
-            .catch((err) =>{
-                setError(err.response.data.message)
-            })
-        getExpenses()
-    }
+  const deleteExpense = async (id) => {
+    const res = await axios.delete(`${baseUrl}/delete-expense/${id}`);
+    getExpenses();
+  };
 
-    const getExpenses = async () => {
-        const response = await axios.get(`${baseUrl}/get-expenses`)
-        setExpenses(response.data)
-        console.log(response.data)
-    }
+  const formatAmount = (amount) => {
+    return parseFloat(amount).toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  };
 
-    const deleteExpense = async (id) => {
-        const res  = await axios.delete(`${baseUrl}/delete-expense/${id}`)
-        getExpenses()
-    }
+  const totalIncome = () => {
+    let totalIncome = 0;
+    incomes.forEach((income) => {
+      const incomeAmount = parseFloat(income.amount);
+      if (!isNaN(incomeAmount)) {
+        totalIncome += incomeAmount;
+      }
+    });
+    return totalIncome;
+  };
 
-    const totalExpenses = () => {
-        let totalIncome = 0;
-        expenses.forEach((income) =>{
-            totalIncome = totalIncome + income.amount
-        })
+  const totalExpenses = () => {
+    let totalExpenses = 0;
+    expenses.forEach((expense) => {
+      const expenseAmount = parseFloat(expense.amount);
+      if (!isNaN(expenseAmount)) {
+        totalExpenses += expenseAmount;
+      }
+    });
+    return totalExpenses;
+  };
 
-        return totalIncome;
-    }
+  const totalBalance = () => {
+    const balance = totalIncome() - totalExpenses();
+    return formatAmount(balance);
+  };
 
+  const transactionHistory = () => {
+    const history = [...incomes, ...expenses];
+    history.sort((a, b) => {
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    });
 
-    const totalBalance = () => {
-        return totalIncome() - totalExpenses()
-    }
+    return history.slice(0, 3);
+  };
 
-    const transactionHistory = () => {
-        const history = [...incomes, ...expenses]
-        history.sort((a, b) => {
-            return new Date(b.createdAt) - new Date(a.createdAt)
-        })
+  return (
+    <TransactionsContext.Provider
+      value={{
+        getIncomes,
+        incomes,
+        deleteIncome,
+        expenses,
+        totalIncome,
+        addTrans,
+        getExpenses,
+        deleteExpense,
+        totalExpenses,
+        totalBalance,
+        transactionHistory,
+        error,
+        setError,
+      }}
+    >
+      {children}
+    </TransactionsContext.Provider>
+  );
+};
 
-        return history.slice(0, 3)
-    }
-
-
-    return (
-        <TransactionsContext.Provider value={{
-            addIncome,
-            getIncomes,
-            incomes,
-            deleteIncome,
-            expenses,
-            totalIncome,
-            addExpense,
-            getExpenses,
-            deleteExpense,
-            totalExpenses,
-            totalBalance,
-            transactionHistory,
-            error,
-            setError
-        }}>
-            {children}
-        </TransactionsContext.Provider>
-    )
-}
-
-export const useTransactionsContext = () =>{
-    return useContext(TransactionsContext)
-}
+export const useTransactionsContext = () => {
+  return useContext(TransactionsContext);
+};
