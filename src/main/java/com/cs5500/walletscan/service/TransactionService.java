@@ -12,4 +12,6 @@ public interface TransactionService {
 
     List<Transaction> getExpense(Long userId);
 
+    ResponseDto delete(Long id);
+
 }

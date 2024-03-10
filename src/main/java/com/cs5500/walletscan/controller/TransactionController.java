@@ -33,6 +33,19 @@ public class TransactionController {
         return new ResponseEntity<>(response, httpStatus);
     }
 
+    @PostMapping("/{id}/delete")
+    public ResponseEntity<ResponseDto> deleteTransaction
+            (@PathVariable Long id){
+        ResponseDto response = transactionService.delete(id);
+        HttpStatus httpStatus = switch (response.getStatusCode()) {
+            case 200 -> HttpStatus.OK;
+            case 400 -> HttpStatus.BAD_REQUEST;
+            default -> HttpStatus.INTERNAL_SERVER_ERROR;
+        };
+
+        return new ResponseEntity<>(response, httpStatus);
+    }
+
     @GetMapping("/incomes/{userid}")
     public List<Transaction> getAllIncomesForUser(@PathVariable Long userid) {
         return transactionService.getIncome(userid);
