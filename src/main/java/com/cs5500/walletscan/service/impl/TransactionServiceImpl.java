@@ -63,6 +63,11 @@ public class TransactionServiceImpl implements TransactionService {
         return transactionRepository.getExpenseByUseridAndExpensesIsTrue(userId);
     }
 
+    @Override
+    public List<Transaction> alltrans() {
+        return transactionRepository.findAll();
+    }
+
     private Transaction mapDtoToEntity(TransactionsDto transactionsDto, Long userId) {
         Transaction transaction = new Transaction();
         transaction.setAmount(transactionsDto.getAmount());

@@ -10,4 +10,5 @@ public interface UserService {
 
     ResponseDto updateUserSettings(Long userId, UserDto userDto);
     ResponseDto updateProfileImage(Long userId, UserDto userDto);
+    ResponseDto updateUserPassword(Long userId, UserDto userDto);
 }

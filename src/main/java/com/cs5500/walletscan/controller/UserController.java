@@ -81,6 +81,19 @@ public class UserController {
         return new ResponseEntity<>(response, httpStatus);
     }
 
+    @PutMapping("/password/{userId}")
+    public ResponseEntity<ResponseDto> updatePassword(@PathVariable Long userId, @RequestBody UserDto userDto) {
+        ResponseDto response = userService.updateUserPassword(userId, userDto);
+        HttpStatus httpStatus = switch (response.getStatusCode()) {
+            case 200 -> HttpStatus.OK;
+            case 400 -> HttpStatus.BAD_REQUEST;
+            case 404 -> HttpStatus.NOT_FOUND;
+            default -> HttpStatus.INTERNAL_SERVER_ERROR;
+        };
+        return new ResponseEntity<>(response, httpStatus);
+    }
+
+
     @PutMapping("/upload/{userId}")
     public ResponseEntity<ResponseDto> updateProfileImage(@PathVariable Long userId, @RequestBody UserDto userDto) {
         ResponseDto response = userService.updateProfileImage(userId, userDto);

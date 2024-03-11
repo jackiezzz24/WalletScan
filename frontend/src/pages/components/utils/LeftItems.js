@@ -21,14 +21,8 @@ export const leftItems = [
     },
     {
         id: 4,
-        title: "Incomes",
+        title: "Budget",
         icon: trend,
-        link: "/dashboard",
-    },
-    {
-        id: 5,
-        title: "Expenses",
-        icon: expenses,
         link: "/dashboard",
     },
 ]

@@ -44,6 +44,29 @@ function RightPanel({ active, setActive, setShowForm }) {
     }));
   }, [profileImageUrl]);
 
+
+  const downloadFile = () => {
+    const baseUrl = process.env.REACT_APP_API;
+    fetch(`${baseUrl}/UserExcelDownloads`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'text/csv', // Update content type to 'text/csv'
+        },
+    })
+    .then(response => response.blob())
+    .then(blob => {
+        const blobUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = 'transactions.csv';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(blobUrl);
+    })
+    .catch(error => console.error('Error downloading file:', error));
+};
+
   return (
     <RightPanelStyled>
       <div className="user-con">
@@ -72,6 +95,13 @@ function RightPanel({ active, setActive, setShowForm }) {
       }}>
         <i className="fa-solid fa-plus" style={{ marginRight: "8px" }}></i>
         Add Transactions
+      </button>
+
+      <button className="button" onClick={() => {
+       downloadFile();
+      }}>
+        <i className="fa-solid fa-plus" style={{ marginRight: "8px" }}></i>
+        Generate Report
       </button>
     </RightPanelStyled>
   );
