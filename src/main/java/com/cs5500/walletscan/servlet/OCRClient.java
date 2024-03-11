@@ -3,9 +3,6 @@ package com.cs5500.walletscan.servlet;
 import com.cs5500.walletscan.model.Text;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.JSONPObject;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -17,16 +14,7 @@ import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
-
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
@@ -39,12 +27,12 @@ public class OCRClient {
         return API_URL + API_KEY;
     }
     
-    public String performOCR(String base64Image) throws OCRException {
+    public String performOCR(String url) throws OCRException {
         CloseableHttpClient client = HttpClients.createDefault();
         HttpPost httpPost = new HttpPost(buildURL());
         httpPost.setHeader("Content-Type", "application/json");
         try {
-            httpPost.setEntity(new StringEntity(createJsonRequestBody(base64Image)));
+            httpPost.setEntity(new StringEntity(createJsonRequestBody(url)));
         } catch (UnsupportedEncodingException e) {
             throw new OCRException("Failed to build entity");
         }
@@ -76,13 +64,14 @@ public class OCRClient {
         }
     }
     
-    private String createJsonRequestBody(String base64Image) {
+    private String createJsonRequestBody(String url) {
         // Create the JSON Object for the request body
         JsonObject jsonRequest = Json.createObjectBuilder()
             .add("requests", Json.createArrayBuilder()
                 .add(Json.createObjectBuilder()
                     .add("image", Json.createObjectBuilder()
-                        .add("content", base64Image))
+                        .add("source", Json.createObjectBuilder()
+                                .add("imageUri", url)))
                     .add("features", Json.createArrayBuilder()
                         .add(Json.createObjectBuilder()
                             .add("type", "TEXT_DETECTION")
