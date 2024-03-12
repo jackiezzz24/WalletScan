@@ -44,6 +44,29 @@ function RightPanel({ active, setActive, setShowForm }) {
     }));
   }, [profileImageUrl]);
 
+
+  const downloadFile = () => {
+    const baseUrl = process.env.REACT_APP_API;
+    fetch(`${baseUrl}/UserExcelDownloads`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'text/csv', 
+        },
+    })
+    .then(response => response.blob())
+    .then(blob => {
+        const blobUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = 'transactions.csv';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(blobUrl);
+    })
+    .catch(error => console.error('Error downloading file:', error));
+};
+
   return (
     <RightPanelStyled>
       <div className="user-con">
@@ -73,14 +96,21 @@ function RightPanel({ active, setActive, setShowForm }) {
         <i className="fa-solid fa-plus" style={{ marginRight: "8px" }}></i>
         Add Transactions
       </button>
+
+      <button className="report-btn" onClick={() => {
+       downloadFile();
+      }}>
+        <i class="fa-solid fa-table-list" style={{ marginRight: "8px" }}></i>
+        Generate Report
+      </button>
     </RightPanelStyled>
   );
 }
 
 const RightPanelStyled = styled.nav`
-  padding: 3rem 1.5rem;
-  width: 374px;
-  height: 55%;
+  padding: 3rem 0rem;
+  width: 20vw;
+  height: 400px;
   background: rgba(252, 246, 249, 0.78);
   border: 3px solid #ffffff;
   backdrop-filter: blur(4.5px);
@@ -111,7 +141,7 @@ const RightPanelStyled = styled.nav`
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 2.5rem;
+    gap: 2rem;
     h2 {
       color: rgba(0, 0, 0, 0.6);
       font-size: 2rem;
@@ -126,21 +156,23 @@ const RightPanelStyled = styled.nav`
       display: grid;
       grid-template-columns: 40px auto;
       align-items: center;
-      margin: 1.5rem 0;
+      margin: 1rem 0;
       font-weight: 500;
       cursor: pointer;
       transition: all 0.4s ease-in-out;
       color: rgba(34, 34, 96, 0.6);
       padding-left: 3rem;
       position: relative;
+      overflow: hidden;  
+      text-overflow: ellipsis; 
       i {
         color: rgba(34, 34, 96, 0.6);
-        font-size: 2.4rem;
+        font-size: 2rem;
         transition: all 0.4s ease-in-out;
       }
       span {
-        font-size: 2rem;
-        margin-left: 2rem;
+        font-size: 1.8rem;
+        margin-left: 1rem;
       }
     }
   }
@@ -163,7 +195,7 @@ const RightPanelStyled = styled.nav`
   }
 
   .button {
-    margin-top: 110px;
+    margin-top: 90px;
     background-color: rgba(34, 34, 126, 1);
     color: white;
     border: none;
@@ -173,6 +205,22 @@ const RightPanelStyled = styled.nav`
     font-size: 2rem;
     cursor: pointer;
     border-radius: 20px;
+  }
+  .report-btn {
+    margin-top: 10px;
+    background-color: rgba(34, 34, 126, 1);
+    color: white;
+    border: none;
+    padding: 35px 20px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 2rem;
+    cursor: pointer;
+    border-radius: 20px;
+  }
+
+  @media screen and (max-width: 1200px) {
+    display: none;
   }
 `;
 

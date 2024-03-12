@@ -1,5 +1,6 @@
 package com.cs5500.walletscan.config;
 
+import com.cs5500.walletscan.repository.TransactionRepository;
 import com.cs5500.walletscan.service.impl.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -18,6 +19,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.util.List;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -31,8 +34,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
-                .authorizeHttpRequests(request -> request.requestMatchers("/api/**,", "/ocr/**").permitAll()
-                        .requestMatchers("/user/**").hasAnyAuthority("USER")
+                .authorizeHttpRequests(request -> request.requestMatchers("/api/**", "/ocr/**").permitAll()
                         .requestMatchers("/api/auth/profile").authenticated()
                         .anyRequest().authenticated())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

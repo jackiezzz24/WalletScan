@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import styled from "styled-components";
 import { InnerLayout } from "./utils/Layout";
 import { useTransactionsContext } from "./TransactionContext";
-import { dollar } from "./utils/Icons";
 import Chart from "./LineGraph";
 import PieChart from "./Pie";
 
@@ -16,7 +15,7 @@ function DashboardForm() {
   }, []);
 
   const formatAmount = (amount) => {
-    return parseFloat(amount).toLocaleString('en-US', {
+    return parseFloat(amount).toLocaleString("en-US", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     });
@@ -30,21 +29,15 @@ function DashboardForm() {
           <div className="amount-con">
             <div className="income">
               <h2>Total Income</h2>
-              <p>
-                {dollar} {formatAmount(totalIncome())}
-              </p>
+              <p>{formatAmount(totalIncome())}</p>
             </div>
             <div className="expense">
               <h2>Total Expense</h2>
-              <p>
-                {dollar} {formatAmount(totalExpenses())}
-              </p>
+              <p>{formatAmount(totalExpenses())}</p>
             </div>
             <div className="balance">
               <h2>Total Balance</h2>
-              <p>
-                {dollar} {totalBalance()}
-              </p>
+              <p>{totalBalance()}</p>
             </div>
           </div>
         </div>
@@ -64,6 +57,9 @@ function DashboardForm() {
 }
 
 const DashboardStyled = styled.div`
+  height: 100%;
+  position: relative;
+
   h1 {
     color: rgba(34, 34, 126, 1);
   }
@@ -93,7 +89,7 @@ const DashboardStyled = styled.div`
 
     .amount-con {
       display: flex;
-      gap: 2rem;
+      gap: 4rem;
       flex-direction: row;
       margin-top: 2rem;
 

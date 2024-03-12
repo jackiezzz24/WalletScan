@@ -1,5 +1,4 @@
 import React, { useContext, useState, useEffect } from "react";
-import axios from "axios";
 
 const baseUrl = process.env.REACT_APP_API;
 const TransactionsContext = React.createContext();
@@ -112,14 +111,30 @@ export const TransactionProvider = ({ children }) => {
     }
   };
 
-  const deleteIncome = async (id) => {
-    const res = await axios.delete(`${baseUrl}/delete-income/${id}`);
-    getIncomes();
-  };
+  const deleteTrans = async (id) => {
+    alert("Transaction ID to delete:", id);
+    try {
+      const response = await fetch(
+        `${baseUrl}/transaction/${id}/delete`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-  const deleteExpense = async (id) => {
-    const res = await axios.delete(`${baseUrl}/delete-expense/${id}`);
-    getExpenses();
+      if (!response.ok) {
+        const result = await response.json();
+        alert(`Failed to delete transaction: ${result.error}`);
+        return;
+      }
+      alert("Transaction deleted.");
+      getIncomes();
+      getExpenses();
+    } catch (error) {
+      alert("An error occurred: " + error.message);
+    }
   };
 
   const formatAmount = (amount) => {
@@ -162,7 +177,7 @@ export const TransactionProvider = ({ children }) => {
       return new Date(b.createdAt) - new Date(a.createdAt);
     });
 
-    return history.slice(0, 3);
+    return history;
   };
 
   return (
@@ -170,12 +185,11 @@ export const TransactionProvider = ({ children }) => {
       value={{
         getIncomes,
         incomes,
-        deleteIncome,
+        deleteTrans,
         expenses,
         totalIncome,
         addTrans,
         getExpenses,
-        deleteExpense,
         totalExpenses,
         totalBalance,
         transactionHistory,

@@ -9,7 +9,8 @@ import java.util.List;
 public interface TransactionService {
     ResponseDto add(Long userId, TransactionsDto transactionsDto);
     List<Transaction> getIncome(Long userId);
-
     List<Transaction> getExpense(Long userId);
+    ResponseDto delete(Long id);
+    List<Transaction> alltrans();
 
 }

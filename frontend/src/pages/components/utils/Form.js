@@ -1,15 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { useTransactionsContext } from "../TransactionContext";
 import Button from "./Btn";
-import { image, plus } from "./Icons";
+import { plus } from "./Icons";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import receipt_image from "../../../assets/images/default-image.jpg";
 
 function Form() {
-  const { addTrans, error, setError } = useTransactionsContext();
+  const { addTrans, setError } = useTransactionsContext();
   const [user, setUser] = useState(null);
+  const [receiptImage, setReceiptImage] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null);
+  const fileInputRef = useRef(null);
+
   const authToken = localStorage.getItem("authToken");
 
   const [inputState, setInputState] = useState({
@@ -79,9 +83,7 @@ function Form() {
     expenses,
     date,
     category,
-    description,
-    userid,
-    receipt_img,
+    description
   } = inputState;
 
   const handleInput = (name) => (e) => {
@@ -100,47 +102,69 @@ function Form() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (!user) {
       console.error("User object is not available");
       return;
     }
+  
+    setInputState((prevInputState) => ({
+      ...prevInputState,
+      userid: user.id,
+    }));
+  
+    try {
+      let cloudinaryUrl = null;
+  
+      if (previewImage) {
+        cloudinaryUrl = await uploadImageToCloudinary();
+      }
+  
+      setInputState((prevInputState) => ({
+        ...prevInputState,
+        receipt_img: cloudinaryUrl || "", // Set an empty string if cloudinaryUrl is null
+      }));
+  
+      console.log('Submitting form with inputState:', inputState);
 
-    setInputState({ ...inputState, userid: user.id });
-
-    if (expenses) {
-      addTrans(inputState);
-      setInputState({
-        merchant: "",
-        amount: "",
-        currency: "",
-        expenses: true,
-        date: "",
-        category: "",
-        description: "",
-        userid: "",
-        receipt_img: "",
-      });
-    } else {
-      addTrans(inputState);
-      setInputState({
-        merchant: "",
-        amount: "",
-        currency: "",
-        expenses: false,
-        date: "",
-        category: "",
-        description: "",
-        userid: "",
-        receipt_img: "",
-      });
+      if (expenses) {
+        addTrans(inputState);
+        setInputState((prevInputState) => ({
+          ...prevInputState,
+          merchant: "",
+          amount: "",
+          currency: "",
+          expenses: true,
+          date: "",
+          category: "",
+          description: "",
+          userid: "",
+          receipt_img: "",
+        }));
+      } else {
+        addTrans(inputState);
+        setInputState((prevInputState) => ({
+          ...prevInputState,
+          merchant: "",
+          amount: "",
+          currency: "",
+          expenses: false,
+          date: "",
+          category: "",
+          description: "",
+          userid: "",
+          receipt_img: "",
+        }));
+      }
+    } catch (submitError) {
+      setError(`Form submission error: ${submitError.message}`);
     }
   };
 
   const uploadImageToCloudinary = async () => {
-    if (image) {
+    if (previewImage) {
       const formData = new FormData();
-      formData.append("file", image);
+      formData.append("file", previewImage);
       formData.append("upload_preset", "ml_default");
 
       try {
@@ -171,9 +195,27 @@ function Form() {
     }
   };
 
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    setReceiptImage(selectedFile);
+
+    if (selectedFile) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewImage(reader.result);
+      };
+      reader.readAsDataURL(selectedFile);
+    } else {
+      setPreviewImage(null);
+    }
+  };
+
+  const handleImageClick = () => {
+    fileInputRef.current.click();
+  };
+
   return (
     <FormStyled onSubmit={handleSubmit}>
-      {error && <p className="error">{error}</p>}
       <div className="inputItem">
         <div className="input-control">
           <input
@@ -217,7 +259,7 @@ function Form() {
             id="date"
             placeholderText="Enter Date"
             selected={date}
-            dateFormat="dd/MM/yyyy"
+            dateFormat="MM/dd/yyyy"
             onChange={(date) => {
               setInputState({ ...inputState, date: date });
             }}
@@ -275,15 +317,6 @@ function Form() {
         </div>
         <div className="submit-btn">
           <Button
-            name={"Upload Receipt"}
-            icon={image}
-            bPad={".8rem 1.6rem"}
-            bRad={"30px"}
-            bg={"rgba(34, 34, 96, 0.6)"}
-            color={"#fff"}
-          />
-
-          <Button
             name={"Save"}
             icon={plus}
             bPad={".8rem 1.6rem"}
@@ -293,12 +326,23 @@ function Form() {
           />
         </div>
       </div>
-      <div className="image-area">
-        {receipt_img ? (
-          <img src={receipt_img} alt="Receipt" />
-        ) : (
-          <img src={receipt_image} alt="Default Receipt" />
-        )}
+      <div className="upload-image" onClick={handleImageClick}>
+        <div className="image-area">
+          {previewImage ? (
+            <img src={previewImage} alt="Selected Receipt" />
+          ) : (
+            <img src={receipt_image} alt="Default Receipt" />
+          )}
+        </div>
+        <div className="file-input">
+          <input
+            type="file"
+            ref={fileInputRef}
+            style={{ display: "none" }}
+            onChange={handleFileChange}
+            accept="image/*"
+          />
+        </div>
       </div>
     </FormStyled>
   );
@@ -337,7 +381,7 @@ const FormStyled = styled.form`
         width: 100%;
       }
     }
-  
+
     .selects {
       display: flex;
       justify-content: space-between;
@@ -348,7 +392,7 @@ const FormStyled = styled.form`
         display: flex;
         align-items: center;
       }
-  
+
       select {
         color: rgba(34, 34, 96, 0.6);
         &:focus,
@@ -357,7 +401,7 @@ const FormStyled = styled.form`
         }
       }
     }
-  
+
     .submit-btn {
       margin-top: 1.2rem;
       display: flex;
@@ -370,7 +414,7 @@ const FormStyled = styled.form`
         }
       }
     }
-  } 
+  }
 
   .image-area {
     margin-top: 1rem;
@@ -380,8 +424,13 @@ const FormStyled = styled.form`
     margin-right: -2rem;
     img {
       max-width: 100%;
-      height: auto;
+      height: 460px;
     }
+  }
+
+  .upload-btn {
+    margin-top: 1rem;
+    margin-left: 1.2rem;
   }
 `;
 export default Form;

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
@@ -33,6 +34,26 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
+    public ResponseDto delete(Long id) {
+        ResponseDto response = new ResponseDto();
+            try {
+                // Assuming you have a method to find a transaction by ID
+                Optional<Transaction> transaction = transactionRepository.findById(id);
+                // Check if the transaction exists and belongs to the specified user
+                if (transaction.isPresent()) {
+                    // Delete the transaction
+                    transactionRepository.delete(transaction.get());
+                }
+                response.setMessage("Transaction deleted Successfully");
+            response.setStatusCode(200);
+        } catch (Exception e) {
+            response.setStatusCode(500);
+            response.setError(e.getMessage());
+        }
+        return response;
+    }
+
+    @Override
     public List<Transaction> getIncome(Long userId) {
         return transactionRepository.getIncomeByUseridAndExpensesIsFalse(userId);
     }
@@ -40,6 +61,11 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public List<Transaction> getExpense(Long userId) {
         return transactionRepository.getExpenseByUseridAndExpensesIsTrue(userId);
+    }
+
+    @Override
+    public List<Transaction> alltrans() {
+        return transactionRepository.findAll();
     }
 
     private Transaction mapDtoToEntity(TransactionsDto transactionsDto, Long userId) {
