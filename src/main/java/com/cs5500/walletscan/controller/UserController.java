@@ -82,8 +82,10 @@ public class UserController {
     }
 
     @PutMapping("/password/{userId}")
-    public ResponseEntity<ResponseDto> updatePassword(@PathVariable Long userId, @RequestBody UserDto userDto) {
-        ResponseDto response = userService.updateUserPassword(userId, userDto);
+    public ResponseEntity<ResponseDto> updatePassword(@PathVariable Long userId,
+                                                      @RequestParam  String oldPassword,
+                                                      @RequestParam  String newPassword) {
+        ResponseDto response = userService.updateUserPassword(userId, oldPassword, newPassword);
         HttpStatus httpStatus = switch (response.getStatusCode()) {
             case 200 -> HttpStatus.OK;
             case 400 -> HttpStatus.BAD_REQUEST;

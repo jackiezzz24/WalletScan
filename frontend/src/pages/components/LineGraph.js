@@ -44,26 +44,35 @@ function LineGraph() {
   }, [incomes, expenses]);
 
   useEffect(() => {
-    // Function to get N evenly spaced dates in the selected month
+    // Function to get N evenly spaced dates in the selected month or all months
     const getEvenlySpacedDates = (startDate, endDate, count) => {
       const dateArray = [];
-      const interval = (endDate - startDate) / (count - 1);
-
+      const interval = (endDate.getTime() - startDate.getTime()) / (count - 1);
+  
       for (let i = 0; i < count; i++) {
         const currentDate = new Date(startDate.getTime() + interval * i);
         dateArray.push(currentDate);
       }
-
+  
       return dateArray;
     };
-
+  
     // Update labelDates even when selectedMonth is null
-    const startDate = new Date(new Date().getFullYear(), selectedMonth || 0, 1);
-    const endDate = new Date(new Date().getFullYear(), (selectedMonth || 0) + 1, 0);
+    const allTransactions = [...incomes, ...expenses];
+  
+    // Determine the date range based on selected month or all months
+    const startDate = selectedMonth !== null
+      ? new Date(new Date().getFullYear(), selectedMonth, 1)
+      : new Date(Math.min(...allTransactions.map(transaction => new Date(transaction.date))));
+  
+    const endDate = selectedMonth !== null
+      ? new Date(new Date().getFullYear(), selectedMonth + 1, 0)
+      : new Date(Math.max(...allTransactions.map(transaction => new Date(transaction.date))));
+  
     const dates = getEvenlySpacedDates(startDate, endDate, 5);
-
+  
     setLabelDates(dates);
-  }, [selectedMonth]);
+  }, [selectedMonth, incomes, expenses]);
 
 
   // Filter incomes and expenses based on the selected month

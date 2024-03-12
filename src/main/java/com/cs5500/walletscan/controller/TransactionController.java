@@ -13,8 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.util.List;
 
 @RestController
@@ -40,7 +38,7 @@ public class TransactionController {
         return new ResponseEntity<>(response, httpStatus);
     }
 
-    @PostMapping("/{id}/delete")
+    @DeleteMapping("/{id}/delete")
     public ResponseEntity<ResponseDto> deleteTransaction
             (@PathVariable Long id){
         ResponseDto response = transactionService.delete(id);

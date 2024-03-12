@@ -6,7 +6,8 @@ import Avatar from "react-avatar-edit";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
-import { useProfileContext } from './ProfileContext';
+import { useProfileContext } from "./ProfileContext";
+import { useNavigate } from "react-router-dom";
 
 function Profile() {
   const [user, setUser] = useState(null);
@@ -16,13 +17,17 @@ function Profile() {
   const [src, setSrc] = useState(false);
   const [pview, setPview] = useState(false);
   const [profile, setProfile] = useState([]);
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const { updateProfileImage } = useProfileContext();
+  const navigate = useNavigate();
 
   const profileFinal = profile.map((item) => item.pview);
+  const baseUrl = process.env.REACT_APP_API;
 
   const getUserProfile = async () => {
     try {
-      const baseUrl = process.env.REACT_APP_API;
       const response = await fetch(`${baseUrl}/auth/profile`, {
         method: "GET",
         headers: {
@@ -116,6 +121,44 @@ function Profile() {
     }
   };
 
+  const handleChangePassword = () => {
+    setShowChangePassword(true);
+  };
+
+  const handleCloseChangePassword = () => {
+    setShowChangePassword(false);
+  };
+
+  const changePassword = async (oldPassword, newPassword) => {
+    try {
+      const response = await fetch(`${baseUrl}/auth/password/${user.id}?oldPassword=${oldPassword}&newPassword=${newPassword}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          "Content-Type": "application/json",
+        }
+      });
+
+      if (!response.ok) {
+        const result = await response.json();
+        alert(`Failed to change password: ${result.error}`);
+        return;
+      }
+
+      alert("Password changed successfully");
+      getUserProfile();
+      setShowChangePassword(false);
+      logout();
+    } catch (error) {
+      alert("An error occurred during password change: " + error.message);
+    }
+  };
+
+  const logout = () => {
+    localStorage.removeItem("authToken");
+    navigate("/register");
+  }
+
   return (
     <ProfileStyled>
       <InnerLayout>
@@ -190,7 +233,55 @@ function Profile() {
             <h4>Email</h4>
             <p>{user?.email || ""}</p>
           </div>
+          <div className="change-password">
+            <button onClick={handleChangePassword}>Change Password</button>
+          </div>
         </div>
+        <Dialog
+          visible={showChangePassword}
+          header={() => <CustomDialogTitle>Change Password</CustomDialogTitle>}
+          onHide={handleCloseChangePassword}
+          style={{
+            background: "rgba(250, 130, 121, 1)",
+            borderRadius: "5%",
+            padding: "1rem",
+          }}
+        >
+          <div className="change-password-content">
+            <div className="passowrd-section">
+              <label htmlFor="oldPassword">Old Password:</label>
+              <br/>
+              <InputText
+                id="oldPassword"
+                type="password"
+                value={oldPassword}
+                onChange={(e) => setOldPassword(e.target.value)}
+              />
+            </div>
+            <br/>
+            <div className="passowrd-section">
+              <label htmlFor="newPassword">New Password:</label>
+              <br/>
+              <InputText
+                id="newPassword"
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+              />
+            </div>
+            <div className="change-password-buttons">
+              <ButtonStyled>
+                <Button
+                  className="password-change"
+                  onClick={() => changePassword(oldPassword, newPassword)}
+                  label="Change Password"
+                  icon="pi pi-check"
+                  style={{ fontSize: "1rem" }}
+                />
+              </ButtonStyled>
+            </div>
+          </div>
+        </Dialog>
       </InnerLayout>
     </ProfileStyled>
   );
@@ -236,12 +327,26 @@ const ProfileStyled = styled.div`
       color: rgba(0, 0, 0, 0.8);
       font-family: "Roboto";
     }
+    .change-password {
+      button {
+        margin-top: 10px;
+        background-color: rgba(254, 154, 56, 1);
+        color: white;
+        border: none;
+        padding: 20px 20px;
+        text-align: center;
+        text-decoration: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        border-radius: 20px;
+      }
+    }
   }
 `;
 
 const CustomDialogTitle = styled.div`
   text-align: center;
-  font-size: 2rem;
+  font-size: 1.2rem;
   font-weight: bold;
   margin-bottom: 1rem;
 `;

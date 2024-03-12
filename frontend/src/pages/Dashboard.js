@@ -1,19 +1,18 @@
 import DashboardForm from "./components/DashboarForm";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import styled from "styled-components";
 import { MainLayout } from "./components/utils/Layout";
 import Orb from "./components/utils/Orb";
-import Income from "./components/Income";
-import Expenses from "./components/Expense";
+import Budget from "./components/Budget";
 import { useTransactionsContext } from "./components/TransactionContext";
 import LeftPanel from "./components/LeftPanel";
 import RightPanel from "./components/RightPanel";
 import Profile from "./components/Profile";
 import Settings from "./components/Settings";
 import { ProfileProvider } from "./components/ProfileContext";
-import TransactionForm from "./components/TransactionForm";
 import CategoryForm from "./components/CategoryForm";
 import AddTransaction from "./components/AddTransaction";
+import History from "./components/History";
 
 function Dashboard() {
   const [active, setActive] = useState(false);
@@ -22,6 +21,18 @@ function Dashboard() {
   const global = useTransactionsContext();
   console.log(global);
 
+  const mainRef = useRef(null);
+  const [showScrollbar, setShowScrollbar] = useState(false);
+  useEffect(() => {
+    const handleScroll = () => {
+      const hasScrollbar = mainRef.current.scrollWidth > mainRef.current.clientWidth;
+      setShowScrollbar(hasScrollbar);
+    };
+    mainRef.current.addEventListener('scroll', handleScroll);
+    handleScroll();
+    return () => mainRef.current.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const displayData = () => {
     if (showForm) {
       return <AddTransaction />;
@@ -29,16 +40,14 @@ function Dashboard() {
       if (active === 1) {
         return <DashboardForm />;
       } else if (active === 2) {
-        return <TransactionForm />;
+        return <History />;
       } else if (active === 3) {
         return <CategoryForm />;
       } else if (active === 4) {
-        return <Income />;
+        return <Budget />;
       } else if (active === 5) {
-        return <Expenses />;
-      } else if (active === 6) {
         return <Profile />;
-      } else if (active === 7) {
+      } else if (active === 6) {
         return <Settings />;
       } else {
         return <DashboardForm />;
@@ -52,20 +61,21 @@ function Dashboard() {
 
   const handleSetActive = (newActive) => {
     if (newActive === active) {
-      setShowForm(!showForm); 
     } else {
-      setShowForm(false); 
+      setShowForm(false);
       setActive(newActive);
     }
   };
 
   return (
-    <DashboardStyled className="Dashboard">
+    <DashboardStyled className="Dashboard" showScrollbar={showScrollbar}>
       {orbMemo}
       <MainLayout>
         <LeftPanel active={active} setActive={handleSetActive} />
         <ProfileProvider>
-          <main>{displayData()}</main>
+          <main ref={mainRef}>
+            <div className="scroll-container">{displayData()}</div>
+          </main>
           <RightPanel
             active={active}
             setActive={handleSetActive}
@@ -78,18 +88,27 @@ function Dashboard() {
 }
 
 const DashboardStyled = styled.div`
-  height: 100vh;
+  height: 860px;
   position: relative;
   main {
     flex: 1;
-    height: 90%;
     background: rgba(252, 246, 249, 0.78);
+    padding: 10px;
     border: 3px solid #ffffff;
     backdrop-filter: blur(4.5px);
-    border-radius: 32px;
-    overflow-x: hidden;
+    border-radius: ${(props) => (props.showScrollbar ? "0" : "32px")};
+    overflow-x: auto;
+
     &::-webkit-scrollbar {
-      width: 0;
+      width: 0px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background-color: #9fedb2;
+      border-radius: 10px;
+    }
+    &::-webkit-scrollbar-track {
+      background-color: #f1f1f1;
+      border-radius: 10px;
     }
   }
 `;
