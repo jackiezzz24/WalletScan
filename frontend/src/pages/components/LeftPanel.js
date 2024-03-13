@@ -26,7 +26,7 @@ function LeftPanel({ active, setActive }) {
 const LeftPanelStyled = styled.nav`
   padding: 5rem 0rem;
   width: 15vw;
-  height: 800px;
+  height: 700px;
   background: rgba(252, 246, 249, 0.78);
   border: 3px solid #ffffff;
   backdrop-filter: blur(4.5px);
@@ -58,8 +58,8 @@ const LeftPanelStyled = styled.nav`
         transition: all 0.4s ease-in-out;
       }
       span {
-        font-size: 1.8rem;
-        margin-left: 1rem; 
+        font-size: 1.5rem;
+        margin-left: .5rem; 
       }
     }
   }

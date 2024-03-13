@@ -109,7 +109,7 @@ function TransactionItem({
       onClick={handleDeleteConfirmation}
     >
       <div className="icon">
-        {expenses === "expense" ? expenseCatIcon() : incomeCatIcon()}
+        {expenses === true ? expenseCatIcon() : incomeCatIcon()}
       </div>
       <div className="content">
         <h5>
