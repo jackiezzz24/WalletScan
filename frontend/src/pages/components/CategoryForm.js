@@ -1,54 +1,139 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { InnerLayout } from "./utils/Layout";
 import { useTransactionsContext } from "./TransactionContext";
-import { dollar } from "./utils/Icons";
-import Chart from "./LineGraph";
-import Pie from "./Pie";
+import TransactionItem from "./utils/TransactionItem";
 
 function CategoryForm() {
-  const { totalExpenses, totalIncome, totalBalance, getIncomes, getExpenses } =
-    useTransactionsContext();
+  const { getExpenses, expenses } = useTransactionsContext();
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
   useEffect(() => {
-    getIncomes();
     getExpenses();
-  }, [getExpenses, getIncomes]);
+  }, [getExpenses]);
+
+  const formatAmount = (amount) => {
+    return parseFloat(amount).toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  };
+
+  const calculateCategoryTotals = () => {
+    const categoryTotals = {};
+
+    expenses.forEach((expense) => {
+      const category = expense.category || "Others";
+      const amount = parseFloat(expense.amount);
+
+      if (!isNaN(amount)) {
+        if (categoryTotals[category]) {
+          categoryTotals[category] += amount;
+        } else {
+          categoryTotals[category] = amount;
+        }
+      }
+    });
+
+    return categoryTotals;
+  };
+
+  const renderCategoryItems = () => {
+    const topCategories = categoryArray
+      .slice(0, 3)
+      .map(({ category, total }) => (
+        <div
+          key={category}
+          className="category"
+          onClick={() => handleCategoryClick(category)}
+        >
+          <h2>{category}</h2>
+          <p>{formatAmount(total)}</p>
+        </div>
+      ));
+
+    const totalOtherCategories = categoryArray
+      .slice(3)
+      .reduce((total, { total: categoryTotal }) => total + categoryTotal, 0);
+
+    const othersCategory = (
+      <div
+        key="Others"
+        className="category"
+        onClick={() => handleCategoryClick("Others")}
+      >
+        <h2>Others</h2>
+        <p>{formatAmount(totalOtherCategories)}</p>
+      </div>
+    );
+
+    return [...topCategories, othersCategory];
+  };
+
+  const handleCategoryClick = (category) => {
+    setSelectedCategory(category === "Others" ? null : category);
+  };
+
+  const categoryTotals = calculateCategoryTotals();
+  const categoryArray = Object.entries(categoryTotals).map(
+    ([category, total]) => ({
+      category,
+      total,
+    })
+  );
+
+  categoryArray.sort((a, b) => b.total - a.total);
+
+  const filteredTransactions = () => {
+    let filtered = expenses;
+  
+    filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+  
+    if (selectedCategory !== null) {
+      if (selectedCategory === "Others") {
+        const top3Categories = categoryArray.slice(0, 3).map(({ category }) => category);
+        console.log(top3Categories);
+        filtered = filtered.filter((transaction) => !top3Categories.includes(transaction.category));
+      } else {
+        filtered = filtered.filter((transaction) => transaction.category === selectedCategory);
+      }
+    }
+  
+    return filtered;
+  };
 
   return (
     <CategoryFormStyled>
       <InnerLayout>
-        <h1>Categories</h1>
-        <div className="stats-con">
-          <div className="amount-con">
-            <div className="income">
-              <h2>Total Income</h2>
-              <p>
-                {dollar} {totalIncome()}
-              </p>
-            </div>
-            <div className="expense">
-              <h2>Total Expense</h2>
-              <p>
-                {dollar} {totalExpenses()}
-              </p>
-            </div>
-            <div className="balance">
-              <h2>Total Balance</h2>
-              <p>
-                {dollar} {totalBalance()}
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="chart-con">
-          <div className="chart">
-            <p>Monthly Trend</p>
-            <Chart />
-          </div>
-          <div className="chart">
-            <p>Spend Details</p>
-            <Pie />
+        <h1>Top 3 Categories</h1>
+        <div className="amount-con">{renderCategoryItems()}</div>
+        <div className="trans-content">
+          <div className="form-container"></div>
+          <div className="transaction">
+            {filteredTransactions().map((transaction) => {
+              const {
+                _id,
+                merchant,
+                amount,
+                date,
+                category,
+                description,
+                expenses,
+              } = transaction;
+              return (
+                <TransactionItem
+                  key={_id}
+                  id={_id}
+                  merchant={merchant}
+                  description={description}
+                  amount={amount}
+                  date={date}
+                  expenses={expenses}
+                  category={category}
+                  indicatorColor={expenses ? "#FF5050" : "#5CB85C"}
+                />
+              );
+            })}
           </div>
         </div>
       </InnerLayout>
@@ -57,76 +142,37 @@ function CategoryForm() {
 }
 
 const CategoryFormStyled = styled.div`
-  h1 {
-    color: rgba(34, 34, 126, 1);
-  }
+h1 {
+  color: rgba(34, 34, 126, 1);
+}
 
-  .chart-con {
-    margin-top: 6rem;
+.amount-con {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  margin-top: 1rem;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+
+  .category {
+    background: #fcf6f9;
+    border: 2px solid #ffffff;
+    box-shadow: 0px 1px 15px rgba(0, 0, 0, 0.06);
+    border-radius: 20px;
+    padding: 1rem 3rem;
     display: flex;
-    gap: 5rem;
+    flex-direction: column; // Keep this if you want h2 and p stacked vertically
 
-    .chart {
-      height: 250px;
-      width: 400px;
-      flex-direction: column;
+    h2 {
+      margin-bottom: 0.5rem;
     }
 
     p {
-      margin-bottom: 0.8rem;
-      font-size: 1.5rem;
-      color: rgba(0, 0, 0, 0.8);
-      padding-left: 2rem;
+      margin: 0;
+      font-size: 1.2rem;
     }
   }
-
-  .stats-con {
-    display: flex;
-    gap: 2rem;
-
-    .amount-con {
-      display: flex;
-      gap: 4rem;
-      flex-direction: row;
-      margin-top: 2rem;
-
-      .income,
-      .expense,
-      .balance {
-        background: #fcf6f9;
-        border: 2px solid #ffffff;
-        box-shadow: 0px 1px 15px rgba(0, 0, 0, 0.06);
-        border-radius: 20px;
-        padding: 1rem 4rem;
-        justify-content: center;
-        align-items: center;
-        display: flex;
-        flex-direction: column;
-        p {
-          font-size: 3.5rem;
-          font-weight: 500;
-        }
-      }
-
-      .income {
-        p {
-          color: green;
-        }
-      }
-
-      .expense {
-        p {
-          color: red;
-        }
-      }
-
-      .balance {
-        p {
-          opacity: 0.6;
-        }
-      }
-    }
-  }
+}
 `;
 
 export default CategoryForm;
