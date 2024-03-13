@@ -56,7 +56,7 @@ const PieChart = () => {
   const othersTotal = sortedCategories
     .slice(3)
     .reduce((acc, [, amount]) => acc + amount, 0);
-  const combinedCategories = [...topCategories, ["Others", othersTotal]];
+  const combinedCategories = othersTotal > 0 ? [...topCategories, ["Others", othersTotal]] : topCategories;
 
   const chartData = {
     labels: combinedCategories.map(([category]) => category),

@@ -139,17 +139,22 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseDto updateUserPassword(Long userId, UserDto userDto) {
+    public ResponseDto updateUserPassword(Long userId, String oldPassword, String newPassword) {
         ResponseDto response = new ResponseDto();
         try {
             User existingUser = userRepository.findById(userId).orElse(null);
 
             if (existingUser != null) {
-                existingUser.setPassword(passwordEncoder.encode(userDto.getPassword()));
-                User savedUser = userRepository.save(existingUser);
-                response.setUser(savedUser);
-                response.setMessage("Password Updated Successfully");
-                response.setStatusCode(200);
+                if (passwordEncoder.matches(oldPassword, existingUser.getPassword())) {
+                    existingUser.setPassword(passwordEncoder.encode(newPassword));
+                    User savedUser = userRepository.save(existingUser);
+                    response.setUser(savedUser);
+                    response.setMessage("Password Updated Successfully");
+                    response.setStatusCode(200);
+                } else {
+                    response.setStatusCode(400);
+                    response.setError("Wrong Password. Please try again");
+                }
             } else {
                 response.setStatusCode(404);
                 response.setError("User Not Found");

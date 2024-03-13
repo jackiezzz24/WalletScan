@@ -29,11 +29,11 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 @CrossOrigin
@@ -59,7 +59,7 @@ public class TransactionController {
         return new ResponseEntity<>(response, httpStatus);
     }
 
-    @PostMapping("/{id}/delete")
+    @DeleteMapping("/{id}/delete")
     public ResponseEntity<ResponseDto> deleteTransaction
             (@PathVariable Long id){
         ResponseDto response = transactionService.delete(id);

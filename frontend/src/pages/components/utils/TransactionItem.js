@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { dateFormat } from "./dataFormat";
 import {
@@ -11,90 +11,112 @@ import {
   comment,
   dollar,
   food,
-  freelance,
+  benefit,
   medical,
   money,
   piggy,
   stocks,
   takeaway,
-  trash,
-  tv,
+  rent,
   users,
-  yt,
+  sponsor,
+  travel,
 } from "./Icons";
-import Button from "./Btn";
 
-function IncomeItem({
+function TransactionItem({
   id,
-  title,
+  merchant,
   amount,
   date,
   category,
   description,
-  deleteItem,
   indicatorColor,
-  type,
+  expenses,
+  deleteItem,
 }) {
-  const categoryIcon = () => {
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const incomeCatIcon = () => {
     switch (category) {
-      case "salary":
+      case "Salary":
         return money;
-      case "freelancing":
-        return freelance;
-      case "investments":
+      case "Investment":
         return stocks;
-      case "stocks":
+      case "Stock":
         return users;
-      case "bitcoin":
+      case "Bitcoin":
         return bitcoin;
-      case "bank":
+      case "Bank":
         return card;
-      case "youtube":
-        return yt;
-      case "other":
+      case "Benefit":
+        return benefit;
+      case "Sponsor":
+        return sponsor;
+      case "Other":
         return piggy;
       default:
-        return "";
+        return piggy;
     }
   };
 
   const expenseCatIcon = () => {
     switch (category) {
-      case "education":
+      case "Education":
         return book;
-      case "groceries":
+      case "Groceries":
         return food;
-      case "health":
+      case "Medical":
         return medical;
-      case "subscriptions":
-        return tv;
-      case "takeaways":
+      case "Rent":
+        return rent;
+      case "Restaurant":
         return takeaway;
-      case "clothing":
+      case "Retail":
         return clothing;
-      case "travelling":
-        return freelance;
-      case "other":
+      case "Travel":
+        return travel;
+      case "Other":
         return circle;
       default:
-        return "";
+        return circle;
     }
   };
 
-  console.log("type", type);
+  const handleDeleteConfirmation = () => {
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteItem = () => {
+    deleteItem();
+    setShowDeleteModal(false);
+  };
+
+  const closeDeleteModal = () => {
+    setShowDeleteModal(false);
+  };
+
+  const formatAmount = (amount) => {
+    const numericAmount = parseFloat(amount);
+    if (!isNaN(numericAmount)) {
+      return numericAmount.toLocaleString("en-US");
+    }
+    return amount;
+  };
 
   return (
-    <IncomeItemStyled indicator={indicatorColor}>
+    <TransItemStyled
+      indicator={indicatorColor}
+      onClick={handleDeleteConfirmation}
+    >
       <div className="icon">
-        {type === "expense" ? expenseCatIcon() : categoryIcon()}
+        {expenses === "expense" ? expenseCatIcon() : incomeCatIcon()}
       </div>
       <div className="content">
-        <h5>{title}</h5>
+        <h5>
+          {category} - {merchant}
+        </h5>
         <div className="inner-content">
           <div className="text">
-            <p>
-              {dollar} {amount}
-            </p>
             <p>
               {calender} {dateFormat(date)}
             </p>
@@ -103,25 +125,41 @@ function IncomeItem({
               {description}
             </p>
           </div>
-          <div className="btn-con">
-            <Button
-              icon={trash}
-              bPad={"1rem"}
-              bRad={"50%"}
-              bg={"var(--primary-color"}
-              color={"#fff"}
-              iColor={"#fff"}
-              hColor={"var(--color-green)"}
-              onClick={() => deleteItem(id)}
-            />
+          <div className="amount">
+            <p>
+              {expenses ? "-" : "+"} {dollar} {formatAmount(amount)}
+            </p>
           </div>
         </div>
       </div>
-    </IncomeItemStyled>
+      {showDeleteModal && (
+        <DeleteModal>
+          <p>Delete this transaction?</p>
+          <div className="button">
+            <button onClick={handleDeleteItem}>Yes</button>
+            <button onClick={(e) => { e.stopPropagation(); closeDeleteModal(); }}>No</button>
+          </div>
+        </DeleteModal>
+      )}
+    </TransItemStyled>
   );
 }
 
-const IncomeItemStyled = styled.div`
+const DeleteModal = styled.div`
+  background: #edc2a8;
+  border: 2px solid #ffffff;
+  box-shadow: 0px 1px 15px rgba(0, 0, 0, 0.06);
+  border-radius: 20px;
+  padding: 1rem;
+
+  .button {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+`;
+
+const TransItemStyled = styled.div`
   background: #fcf6f9;
   border: 2px solid #ffffff;
   box-shadow: 0px 1px 15px rgba(0, 0, 0, 0.06);
@@ -177,6 +215,7 @@ const IncomeItemStyled = styled.div`
         display: flex;
         align-items: center;
         gap: 1.5rem;
+        padding-left: 2rem;
         p {
           display: flex;
           align-items: center;
@@ -185,8 +224,13 @@ const IncomeItemStyled = styled.div`
           opacity: 0.8;
         }
       }
+      .amount {
+        p {
+          font-size: 1.8rem;
+        }
+      }
     }
   }
 `;
 
-export default IncomeItem;
+export default TransactionItem;
