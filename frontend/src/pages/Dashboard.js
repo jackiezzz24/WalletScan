@@ -1,5 +1,5 @@
 import DashboardForm from "./components/DashboarForm";
-import React, { useState, useMemo, useRef, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import styled from "styled-components";
 import { MainLayout } from "./components/utils/Layout";
 import Orb from "./components/utils/Orb";
@@ -20,18 +20,6 @@ function Dashboard() {
 
   const global = useTransactionsContext();
   console.log(global);
-
-  const mainRef = useRef(null);
-  const [showScrollbar, setShowScrollbar] = useState(false);
-  useEffect(() => {
-    const handleScroll = () => {
-      const hasScrollbar = mainRef.current.scrollWidth > mainRef.current.clientWidth;
-      setShowScrollbar(hasScrollbar);
-    };
-    mainRef.current.addEventListener('scroll', handleScroll);
-    handleScroll();
-    return () => mainRef.current.removeEventListener('scroll', handleScroll);
-  }, []);
 
   const displayData = () => {
     if (showForm) {
@@ -68,12 +56,12 @@ function Dashboard() {
   };
 
   return (
-    <DashboardStyled className="Dashboard" showScrollbar={showScrollbar}>
+    <DashboardStyled className="Dashboard">
       {orbMemo}
       <MainLayout>
         <LeftPanel active={active} setActive={handleSetActive} />
         <ProfileProvider>
-          <main ref={mainRef}>
+          <main>
             <div className="scroll-container">{displayData()}</div>
           </main>
           <RightPanel
@@ -88,7 +76,7 @@ function Dashboard() {
 }
 
 const DashboardStyled = styled.div`
-  height: 860px;
+  height: 760px;
   position: relative;
   main {
     flex: 1;
@@ -96,7 +84,7 @@ const DashboardStyled = styled.div`
     padding: 10px;
     border: 3px solid #ffffff;
     backdrop-filter: blur(4.5px);
-    border-radius: ${(props) => (props.showScrollbar ? "0" : "32px")};
+    border-radius: 32px;
     overflow-x: auto;
 
     &::-webkit-scrollbar {

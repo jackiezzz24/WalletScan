@@ -65,7 +65,7 @@ const DashboardStyled = styled.div`
   }
 
   .chart-con {
-    margin-top: 5rem;
+    margin-top: 3rem;
     display: flex;
     gap: 3rem;
 
@@ -85,13 +85,13 @@ const DashboardStyled = styled.div`
 
   .stats-con {
     display: flex;
-    gap: 2rem;
+    gap: 1rem;
 
     .amount-con {
       display: flex;
-      gap: 4rem;
+      gap: 2rem;
       flex-direction: row;
-      margin-top: 2rem;
+      margin-top: 1rem;
 
       .income,
       .expense,
