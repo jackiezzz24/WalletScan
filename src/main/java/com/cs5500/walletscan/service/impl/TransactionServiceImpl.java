@@ -1,5 +1,6 @@
 package com.cs5500.walletscan.service.impl;
 
+import com.cs5500.walletscan.controller.TransactionController;
 import com.cs5500.walletscan.dto.ResponseDto;
 import com.cs5500.walletscan.dto.TransactionsDto;
 import com.cs5500.walletscan.entity.Transaction;
@@ -67,6 +68,7 @@ public class TransactionServiceImpl implements TransactionService {
     public List<Transaction> alltrans() {
         return transactionRepository.findAll();
     }
+
 
     private Transaction mapDtoToEntity(TransactionsDto transactionsDto, Long userId) {
         Transaction transaction = new Transaction();
