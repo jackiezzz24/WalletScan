@@ -1,8 +1,13 @@
 package com.cs5500.walletscan.entity;
 
+import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
+import com.alibaba.excel.annotation.ExcelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 
 import java.util.Date;
 
@@ -10,14 +15,17 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode
 @Entity
 @Table(name = "transactions")
 @Data
+
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column (nullable = false)
+    @Excel(name = "category", width = 10)
     private String category;
     @Column (nullable = false)
     private String amount;
