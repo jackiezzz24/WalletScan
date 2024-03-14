@@ -64,7 +64,7 @@ public class UserServiceImpl implements UserService {
             user.setUsername(signupRequest.getUsername());
             user.setEmail(email);
             user.setPassword(passwordEncoder.encode(password));
-            user.setBudget("0");
+            user.setBudget("1000");
             user.setCurrency("USD");
             user.setNotification(true);
             user.setSubscribe(true);

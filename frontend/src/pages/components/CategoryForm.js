@@ -7,108 +7,159 @@ import TransactionItem from "./utils/TransactionItem";
 function CategoryForm() {
   const { getExpenses, expenses } = useTransactionsContext();
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedMonth, setSelectedMonth] = useState(null);
+  const [availableMonths, setAvailableMonths] = useState([]);
+  const [allCategories, setAllCategories] = useState([]);
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const toggleExpansion = () => {
+    setIsExpanded(!isExpanded);
+  };
+
+  const getMonthName = (month) => {
+    const monthNames = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+    return monthNames[month];
+  };
 
   useEffect(() => {
     getExpenses();
   }, [getExpenses]);
 
-  const formatAmount = (amount) => {
-    return parseFloat(amount).toLocaleString("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
+  useEffect(() => {
+    const allMonths = [
+      ...new Set(
+        [...expenses].map((transaction) =>
+          new Date(transaction.date).getMonth()
+        )
+      ),
+    ];
+    const sortedMonths = allMonths.sort((a, b) => a - b);
+    setAvailableMonths(sortedMonths);
+  }, [expenses]);
+
+  useEffect(() => {
+    const categories = [
+      ...new Set(
+        expenses
+          .filter(
+            (transaction) =>
+              selectedMonth === null ||
+              new Date(transaction.date).getMonth() === selectedMonth
+          )
+          .map((transaction) => transaction.category || "Others")
+      ),
+    ];
+    setAllCategories(categories);
+  }, [expenses, selectedMonth]);
+
+  const handleMonthChange = (event) => {
+    const selectedValue = parseInt(event.target.value, 10);
+    setSelectedMonth(selectedValue === -1 ? null : selectedValue);
   };
 
-  const calculateCategoryTotals = () => {
-    const categoryTotals = {};
+  const filteredTransactions = () => {
+    let filtered = expenses;
 
-    expenses.forEach((expense) => {
-      const category = expense.category || "Others";
-      const amount = parseFloat(expense.amount);
+    if (selectedCategory !== null) {
+      filtered = filtered.filter(
+        (transaction) => transaction.category === selectedCategory
+      );
+    }
 
-      if (!isNaN(amount)) {
-        if (categoryTotals[category]) {
-          categoryTotals[category] += amount;
-        } else {
-          categoryTotals[category] = amount;
-        }
-      }
-    });
+    if (selectedMonth !== null && selectedMonth !== -1) {
+      filtered = filtered.filter((transaction) => {
+        const transactionDate = new Date(transaction.date);
+        return transactionDate.getMonth() === selectedMonth;
+      });
+    }
 
-    return categoryTotals;
+    filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    return filtered;
   };
 
   const renderCategoryItems = () => {
-    const topCategories = categoryArray
-      .slice(0, 3)
-      .map(({ category, total }) => (
+    return allCategories.map((category) => {
+      const total = calculateCategoryTotal(category);
+      return (
         <div
           key={category}
           className="category"
           onClick={() => handleCategoryClick(category)}
         >
           <h2>{category}</h2>
-          <p>{formatAmount(total)}</p>
         </div>
-      ));
-
-    const totalOtherCategories = categoryArray
-      .slice(3)
-      .reduce((total, { total: categoryTotal }) => total + categoryTotal, 0);
-
-    const othersCategory = (
-      <div
-        key="Others"
-        className="category"
-        onClick={() => handleCategoryClick("Others")}
-      >
-        <h2>Others</h2>
-        <p>{formatAmount(totalOtherCategories)}</p>
-      </div>
-    );
-
-    return [...topCategories, othersCategory];
+      );
+    });
   };
 
   const handleCategoryClick = (category) => {
-    setSelectedCategory(category === "Others" ? null : category);
+    setSelectedCategory(category);
   };
 
-  const categoryTotals = calculateCategoryTotals();
-  const categoryArray = Object.entries(categoryTotals).map(
-    ([category, total]) => ({
-      category,
-      total,
-    })
-  );
+  const calculateCategoryTotal = (category) => {
+    const filtered = expenses.filter((transaction) => {
+      return (
+        (selectedCategory === null ||
+          transaction.category === selectedCategory) &&
+        (selectedMonth === null ||
+          new Date(transaction.date).getMonth() === selectedMonth)
+      );
+    });
 
-  categoryArray.sort((a, b) => b.total - a.total);
+    const total = filtered.reduce((accumulator, current) => {
+      return accumulator + parseFloat(current.amount);
+    }, 0);
 
-  const filteredTransactions = () => {
-    let filtered = expenses;
-  
-    filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
-  
-    if (selectedCategory !== null) {
-      if (selectedCategory === "Others") {
-        const top3Categories = categoryArray.slice(0, 3).map(({ category }) => category);
-        console.log(top3Categories);
-        filtered = filtered.filter((transaction) => !top3Categories.includes(transaction.category));
-      } else {
-        filtered = filtered.filter((transaction) => transaction.category === selectedCategory);
-      }
-    }
-  
-    return filtered;
+    return total;
   };
 
   return (
     <CategoryFormStyled>
       <InnerLayout>
-        <h1>Top 3 Categories</h1>
-        <div className="amount-con">{renderCategoryItems()}</div>
+        <div className="header">
+          <h1>Categories</h1>
+          <div className="select-container">
+            <select
+              onChange={handleMonthChange}
+              value={selectedMonth === null ? -1 : selectedMonth}
+              className="select"
+            >
+              <option value={-1}>All Months</option>
+              {availableMonths.map((month, index) => (
+                <option key={index} value={month}>
+                  {getMonthName(month)}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+       <div className="amount-con">
+          <div className={`category-container ${isExpanded ? 'expanded' : ''}`}>
+            {/* Render your category items here */}
+            {renderCategoryItems()}
+          </div>
+          {/* Show the expand/collapse icon */}
+          {allCategories.length > 4 && (
+            <div className="toggle-icon" onClick={toggleExpansion}>
+              {isExpanded ? <span>-</span> : <span>+</span>}
+            </div>
+          )}
+        </div>
         <div className="trans-content">
-          <div className="form-container"></div>
           <div className="transaction">
             {filteredTransactions().map((transaction) => {
               const {
@@ -142,37 +193,74 @@ function CategoryForm() {
 }
 
 const CategoryFormStyled = styled.div`
-h1 {
-  color: rgba(34, 34, 126, 1);
-}
-
-.amount-con {
   display: flex;
-  flex-direction: row;
-  gap: 2rem;
-  margin-top: 1rem;
-  justify-content: center;
-  margin-bottom: 1.5rem;
-
-  .category {
-    background: #fcf6f9;
-    border: 2px solid #ffffff;
-    box-shadow: 0px 1px 15px rgba(0, 0, 0, 0.06);
-    border-radius: 20px;
-    padding: 1rem 3rem;
+  overflow: auto;
+  flex-direction: column;
+  .header {
     display: flex;
-    flex-direction: column; // Keep this if you want h2 and p stacked vertically
+    align-items: center;
+    margin-bottom: 1rem;
+  }
 
-    h2 {
-      margin-bottom: 0.5rem;
+  h1 {
+    color: rgba(34, 34, 126, 1);
+  }
+
+  .select-container {
+    margin-left: 1rem;
+  }
+
+  .select {
+    width: 100%;
+  }
+
+  .amount-con {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    margin-top: 1rem;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+
+    .category-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      overflow: hidden;
+      max-height: 6rem; 
+      transition: max-height 0.3s ease-in-out;
+
+      &.expanded {
+        max-height: none;
+      }
     }
 
-    p {
-      margin: 0;
-      font-size: 1.2rem;
+    .toggle-icon {
+      cursor: pointer;
+      margin-top: -2.5rem;
+
+      span {
+        font-size: 1.5rem;
+      }
+    }
+
+    .category {
+      background: #fcf6f9;
+      border: 2px solid #ffffff;
+      box-shadow: 0px 1px 15px rgba(0, 0, 0, 0.06);
+      border-radius: 20px;
+      padding: 0.4rem 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 1rem; 
+
+      h2 {
+        margin-bottom: 0.5rem;
+      }
     }
   }
-}
 `;
 
 export default CategoryForm;

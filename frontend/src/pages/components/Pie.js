@@ -23,7 +23,8 @@ const PieChart = () => {
         )
       ),
     ];
-    setAvailableMonths(allMonths);
+    const sortedMonths = allMonths.sort((a, b) => a - b); 
+    setAvailableMonths(sortedMonths);
   }, [expenses]);
 
   const handleMonthChange = (event) => {
@@ -56,7 +57,10 @@ const PieChart = () => {
   const othersTotal = sortedCategories
     .slice(3)
     .reduce((acc, [, amount]) => acc + amount, 0);
-  const combinedCategories = othersTotal > 0 ? [...topCategories, ["Others", othersTotal]] : topCategories;
+  const combinedCategories =
+    othersTotal > 0
+      ? [...topCategories, ["Others", othersTotal]]
+      : topCategories;
 
   const chartData = {
     labels: combinedCategories.map(([category]) => category),
@@ -76,9 +80,10 @@ const PieChart = () => {
   const options = {
     responsive: true,
     maintainAspectRatio: false,
-    legend: {
-      display: true,
-      position: "right",
+    plugins: {
+      legend: {
+        position: 'right',
+      },
     },
   };
 
