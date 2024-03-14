@@ -120,9 +120,11 @@ function Form() {
         cloudinaryUrl = await uploadImageToCloudinary();
       }
   
+      readImage(cloudinaryUrl);
+
       setInputState((prevInputState) => ({
         ...prevInputState,
-        receipt_img: cloudinaryUrl || "", // Set an empty string if cloudinaryUrl is null
+        receipt_img: cloudinaryUrl || "", 
       }));
   
       console.log('Submitting form with inputState:', inputState);
@@ -158,6 +160,26 @@ function Form() {
       }
     } catch (submitError) {
       setError(`Form submission error: ${submitError.message}`);
+    }
+  };
+
+  const readImage = async (cloudinaryUrl) => {
+    try {
+      const baseUrl = process.env.REACT_APP_API;
+      const response = await fetch(`${baseUrl}/ocr`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ url: cloudinaryUrl })
+      });
+
+      if (!response.ok) {
+        const errorMessage = await response.text();
+        throw new Error(errorMessage);
+      }
+    } catch (error) {
+      setError(error.message);
     }
   };
 
