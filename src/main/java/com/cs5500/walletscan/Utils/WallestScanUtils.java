@@ -1,6 +1,6 @@
 package com.cs5500.walletscan.Utils;
 
-import com.cs5500.walletscan.model.Receipt;
+import com.cs5500.walletscan.entity.Receipt;
 import com.cs5500.walletscan.model.Text;
 import java.util.List;
 

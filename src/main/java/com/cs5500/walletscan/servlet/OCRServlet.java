@@ -1,7 +1,7 @@
 package com.cs5500.walletscan.servlet;
 
 import com.cs5500.walletscan.Utils.WallestScanUtils;
-import com.cs5500.walletscan.model.Receipt;
+import com.cs5500.walletscan.entity.Receipt;
 import com.cs5500.walletscan.model.Text;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -12,12 +12,12 @@ import org.cloudinary.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
-import javax.json.JsonObject;
 
-@WebServlet(name="OCRServlet", urlPatterns = {"/ocr"})
+@WebServlet(name = "OCRServlet", urlPatterns = { "/api/ocr" })
 public class OCRServlet extends HttpServlet {
-    
+
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         // Ensure the content type is application/json
@@ -51,5 +51,15 @@ public class OCRServlet extends HttpServlet {
         List<Text> texts;
         texts = client.getText(client.performOCR(url));
         Receipt receipt = WallestScanUtils.readTextToReceipt(texts);
+        JSONObject res = new JSONObject();
+        res.put("merchant", receipt.getStoreName());
+        res.put("amount", receipt.getTotal() + "");
+        res.put("date", receipt.getDate());
+
+        // Set content type
+        resp.setContentType("application/json");
+        PrintWriter out = resp.getWriter();
+        out.println(res.toString());
+        out.close();
     }
 }
