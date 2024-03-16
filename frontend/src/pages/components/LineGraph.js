@@ -40,11 +40,11 @@ function LineGraph() {
         )
       ),
     ];
-    setAvailableMonths(allMonths);
+    const sortedMonths = allMonths.sort((a, b) => a - b); 
+    setAvailableMonths(sortedMonths);
   }, [incomes, expenses]);
 
   useEffect(() => {
-    // Function to get N evenly spaced dates in the selected month or all months
     const getEvenlySpacedDates = (startDate, endDate, count) => {
       const dateArray = [];
       const interval = (endDate.getTime() - startDate.getTime()) / (count - 1);
@@ -57,10 +57,8 @@ function LineGraph() {
       return dateArray;
     };
   
-    // Update labelDates even when selectedMonth is null
     const allTransactions = [...incomes, ...expenses];
   
-    // Determine the date range based on selected month or all months
     const startDate = selectedMonth !== null
       ? new Date(new Date().getFullYear(), selectedMonth, 1)
       : new Date(Math.min(...allTransactions.map(transaction => new Date(transaction.date))));
@@ -69,13 +67,11 @@ function LineGraph() {
       ? new Date(new Date().getFullYear(), selectedMonth + 1, 0)
       : new Date(Math.max(...allTransactions.map(transaction => new Date(transaction.date))));
   
-    const dates = getEvenlySpacedDates(startDate, endDate, 5);
+    const dates = getEvenlySpacedDates(startDate, endDate, 4);
   
     setLabelDates(dates);
   }, [selectedMonth, incomes, expenses]);
 
-
-  // Filter incomes and expenses based on the selected month
   const filteredIncomes =
   selectedMonth !== null
     ? incomes.filter((inc) => new Date(inc.date).getMonth() === selectedMonth)
@@ -88,7 +84,6 @@ const filteredExpenses =
       )
     : expenses;
 
-// Sort filtered incomes and expenses by date
 const sortedIncomes = filteredIncomes
   .slice()
   .sort((a, b) => new Date(a.date) - new Date(b.date));
