@@ -9,6 +9,8 @@ import com.cs5500.walletscan.dto.ResponseDto;
 import com.cs5500.walletscan.dto.TransactionsDto;
 import com.cs5500.walletscan.entity.Transaction;
 import com.cs5500.walletscan.service.TransactionService;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -19,8 +21,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -76,44 +80,6 @@ public class TransactionController {
         return transactionService.getExpense(userid);
     }
 
-    @RequestMapping(value = "UserExcelDownloads", method = RequestMethod.GET)
-    public void downloadAllClassmate(HttpServletResponse response) throws IOException {
-        HSSFWorkbook workbook = new HSSFWorkbook();// Create HSSFWorkbook object, excel's document object
-        HSSFSheet sheet = workbook.createSheet("report"); // Excel's form
-
-        List<Transaction> alltransList = transactionService.alltrans();
-
-        String fileName = "transactions.csv";// Set the name of the file to be exported
-        // Add data rows and set cell data
-        int rowNum = 1;
-        String[] headers = { "Date", "Category", "Merchant", "Currency", "Amount" };
-        // headers represent the header of the first row in the excel table
-        HSSFRow row = sheet.createRow(0);
-        // Add header to the excel table
-        for(int i = 0; i < headers.length; i++){
-            HSSFCell cell = row.createCell(i);
-            HSSFRichTextString text = new HSSFRichTextString(headers[i]);
-            cell.setCellValue(text);
-        }
-
-        // Add queried data to the corresponding columns in the table
-        for (Transaction transaction : alltransList) {
-            HSSFRow row1 = sheet.createRow(rowNum);
-            row1.createCell(0).setCellValue(transaction.getDate());
-            row1.createCell(1).setCellValue(transaction.getCategory());
-            row1.createCell(2).setCellValue(transaction.getMerchant());
-            row1.createCell(3).setCellValue(transaction.getCurrency());
-            row1.createCell(4).setCellValue(transaction.getAmount());
-            rowNum++;
-        }
-
-        // Set the Content-Type to "text/csv"
-        response.setContentType("text/csv");
-        // Set the header to specify the file name for the download
-        response.setHeader("Content-disposition", "attachment;filename=" + fileName);
-        response.flushBuffer();
-        workbook.write(response.getOutputStream());
-    }
 
     //导出为Excel
 
