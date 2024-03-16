@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
     List<Transaction> getIncomeByUseridAndExpensesIsFalse (Long userId);
     List<Transaction> getExpenseByUseridAndExpensesIsTrue (Long userId);
-    List<Transaction> findAll();
+    //List<Transaction> findAll();
 
 }
 

@@ -25,7 +25,6 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column (nullable = false)
-    @Excel(name = "category", width = 10)
     private String category;
     @Column (nullable = false)
     private String amount;
