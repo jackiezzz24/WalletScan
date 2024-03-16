@@ -88,7 +88,7 @@ public class TransactionController {
         List<Transaction> transactions = transactionRepository.findAll();
 
         if (!CollectionUtils.isEmpty(transactions)) {
-            String fileName = "Transactions Export" + ".xlsx";
+            String fileName = "Transactions export" + ".xlsx";
 
             ByteArrayInputStream in = ExcelUtils.exportCustomer(transactions, fileName);
 
