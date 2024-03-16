@@ -26,7 +26,7 @@ function Form() {
     description: "",
     userid: "",
     receipt_img: "",
-  });
+  }, console.log('render'));
   const currencies = ["USD", "CAD", "CNY", "EUR", "GBP", "JPY"];
   const expenseCategories = [
     "Education",
@@ -76,15 +76,8 @@ function Form() {
     getUserProfile();
   }, []);
 
-  const {
-    merchant,
-    amount,
-    currency,
-    expenses,
-    date,
-    category,
-    description
-  } = inputState;
+  const { merchant, amount, currency, expenses, date, category, description } =
+    inputState;
 
   const handleInput = (name) => (e) => {
     const value = e.target.value;
@@ -102,37 +95,67 @@ function Form() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (!user) {
       console.error("User object is not available");
       return;
     }
-  
+
     setInputState((prevInputState) => ({
       ...prevInputState,
       userid: user.id,
     }));
-  
+
     try {
       let cloudinaryUrl = null;
-  
+
       if (previewImage) {
         cloudinaryUrl = await uploadImageToCloudinary();
       }
-  
+
+      // Capture the response from readImage function
+      await readImage(cloudinaryUrl);
+
       setInputState((prevInputState) => ({
         ...prevInputState,
-        receipt_img: cloudinaryUrl || "", // Set an empty string if cloudinaryUrl is null
+        receipt_img: cloudinaryUrl || "",
       }));
-  
-      console.log('Submitting form with inputState:', inputState);
+
+      console.log("Submitting form with inputState:", inputState);
 
       if (expenses) {
         addTrans(inputState);
-        setInputState((prevInputState) => ({
+      } else {
+        addTrans(inputState);
+      }
+    } catch (submitError) {
+      setError(`Form submission error: ${submitError.message}`);
+    }
+  };
+
+  const readImage = async (cloudinaryUrl) => {
+    try {
+      const baseUrl = process.env.REACT_APP_API;
+      const response = await fetch(`${baseUrl}/ocr`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ url: cloudinaryUrl }),
+      });
+
+      if (!response.ok) {
+        const errorMessage = await response.text();
+        throw new Error(errorMessage);
+      }
+      // Parse the JSON response and return the relevant data
+      const responseData = await response.json();
+      const { merchant, amount, date } = responseData;
+      setInputState((prevInputState) => {
+        const updatedState = {
           ...prevInputState,
-          merchant: "",
-          amount: "",
+          merchant: merchant,
+          amount: amount,
           currency: "",
           expenses: true,
           date: "",
@@ -140,24 +163,12 @@ function Form() {
           description: "",
           userid: "",
           receipt_img: "",
-        }));
-      } else {
-        addTrans(inputState);
-        setInputState((prevInputState) => ({
-          ...prevInputState,
-          merchant: "",
-          amount: "",
-          currency: "",
-          expenses: false,
-          date: "",
-          category: "",
-          description: "",
-          userid: "",
-          receipt_img: "",
-        }));
-      }
-    } catch (submitError) {
-      setError(`Form submission error: ${submitError.message}`);
+        };
+        console.log("Updated state:", updatedState);
+        return updatedState;
+      });
+    } catch (error) {
+      throw new Error(`Error reading image: ${error.message}`);
     }
   };
 
@@ -220,7 +231,7 @@ function Form() {
         <div className="input-control">
           <input
             type="text"
-            value={merchant}
+            value={inputState.merchant}
             name={"merchant"}
             placeholder="Merchant"
             onChange={handleInput("merchant")}

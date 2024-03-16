@@ -1,84 +1,113 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useTransactionsContext } from "./TransactionContext";
 import { InnerLayout } from "./utils/Layout";
 import TransactionItem from "./utils/TransactionItem";
 
 function History() {
-  const {
-    incomes,
-    getIncomes,
-    totalIncome,
-    getExpenses,
-    totalExpenses,
-    expenses,
-    transactionHistory,
-    totalBalance,
-    deleteTrans
-  } = useTransactionsContext();
+  const { incomes, expenses, transactionHistory, deleteTrans } =
+    useTransactionsContext();
 
   const [...history] = transactionHistory();
 
   const [selectedFilter, setSelectedFilter] = useState("all");
+  const [selectedMonth, setSelectedMonth] = useState(null);
+  const [availableMonths, setAvailableMonths] = useState([]);
+  const getMonthName = (month) => {
+    const monthNames = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+    return monthNames[month];
+  };
+
+  useEffect(() => {
+    const allMonths = [
+      ...new Set(
+        [...incomes, ...expenses].map((transaction) =>
+          new Date(transaction.date).getMonth()
+        )
+      ),
+    ];
+    const sortedMonths = allMonths.sort((a, b) => a - b);
+    setAvailableMonths(sortedMonths);
+  }, [incomes, expenses]);
 
   const handleFilter = (filter) => {
     setSelectedFilter(filter);
   };
 
-  const filteredTransactions = () => {
-    let transactionsToDisplay;
-  
-    if (selectedFilter === "incomes") {
-      transactionsToDisplay = [...incomes];
-    } else if (selectedFilter === "expenses") {
-      transactionsToDisplay = [...expenses];
-    } else {
-      transactionsToDisplay = [...history];
-    }
-  
-    transactionsToDisplay.sort((a, b) => new Date(b.date) - new Date(a.date));
-  
-    return transactionsToDisplay;
+  const handleMonthChange = (event) => {
+    const selectedValue = parseInt(event.target.value, 10);
+    setSelectedMonth(selectedValue === -1 ? null : selectedValue);
   };
 
-  const formatAmount = (amount) => {
-    return parseFloat(amount).toLocaleString("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
+  const filteredTransactions = () => {
+    let transactionsToDisplay = [...history];
+
+    if (selectedFilter === "incomes") {
+      transactionsToDisplay = incomes.filter((income) => {
+        const incomeDate = new Date(income.date);
+        return (
+          selectedMonth === null || incomeDate.getMonth() === selectedMonth
+        );
+      });
+    } else if (selectedFilter === "expenses") {
+      transactionsToDisplay = expenses.filter((expense) => {
+        const expenseDate = new Date(expense.date);
+        return (
+          selectedMonth === null || expenseDate.getMonth() === selectedMonth
+        );
+      });
+    } else {
+      transactionsToDisplay = history.filter((transaction) => {
+        const transactionDate = new Date(transaction.date);
+        return (
+          selectedMonth === null || transactionDate.getMonth() === selectedMonth
+        );
+      });
+    }
+
+    transactionsToDisplay.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    return transactionsToDisplay;
   };
 
   return (
     <HistoryStyled>
       <InnerLayout>
-        <h1>All Transactions</h1>
+        <div className="header">
+          <h1>All Transactions</h1>
+          <div className="select-container">
+            <select
+              onChange={handleMonthChange}
+              value={selectedMonth === null ? -1 : selectedMonth}
+              className="select"
+            >
+              <option value={-1}>All Months</option>
+              {availableMonths.map((month, index) => (
+                <option key={index} value={month}>
+                  {getMonthName(month)}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
         <div className="filter-buttons">
           <button onClick={() => handleFilter("all")}>All</button>
           <button onClick={() => handleFilter("incomes")}>Incomes</button>
           <button onClick={() => handleFilter("expenses")}>Expenses</button>
         </div>
-        {selectedFilter === "all" && (
-          <h2 className="total-balance">
-            Total Balance:{" "}
-            <span style={{ marginLeft: "20px" }}>${totalBalance()}</span>
-          </h2>
-        )}
-        {selectedFilter === "incomes" && (
-          <h2 className="total-income">
-            Total Income:{" "}
-            <span style={{ marginLeft: "20px" }}>
-              ${formatAmount(totalIncome())}
-            </span>
-          </h2>
-        )}
-        {selectedFilter === "expenses" && (
-          <h2 className="total-expenses">
-            Total Expenses:{" "}
-            <span style={{ marginLeft: "20px" }}>
-              ${formatAmount(totalExpenses())}
-            </span>
-          </h2>
-        )}
         <div className="trans-content">
           <div className="form-container"></div>
           <div className="transaction">
@@ -118,6 +147,12 @@ const HistoryStyled = styled.div`
   display: flex;
   overflow: auto;
   flex-direction: column;
+  .header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
   .filter-buttons {
     display: flex;
     gap: 4rem;
@@ -138,26 +173,6 @@ const HistoryStyled = styled.div`
     }
   }
 
-  .total-income,
-  .total-expenses,
-  .total-balance {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #fcf6f9;
-    border: 2px solid #ffffff;
-    box-shadow: 0px 1px 15px rgba(0, 0, 0, 0.06);
-    border-radius: 20px;
-    padding: 1rem;
-    margin: 1rem 0;
-    font-size: 2rem;
-    gap: 0.5rem;
-    span {
-      font-size: 2.5rem;
-      font-weight: 800;
-      color: var(--color-green);
-    }
-  }
   .trans-content {
     display: flex;
     gap: 2rem;
@@ -165,8 +180,17 @@ const HistoryStyled = styled.div`
       flex: 1;
     }
   }
+
   h1 {
     color: rgba(34, 34, 126, 1);
+  }
+
+  .select-container {
+    margin-left: 1rem; 
+  }
+
+  .select {
+    width: 100%; 
   }
 `;
 

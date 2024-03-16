@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { InnerLayout } from "./utils/Layout";
 import { useTransactionsContext } from "./TransactionContext";
@@ -6,13 +6,50 @@ import Chart from "./LineGraph";
 import PieChart from "./Pie";
 
 function DashboardForm() {
-  const { totalExpenses, totalIncome, totalBalance, getIncomes, getExpenses } =
+  const { getIncomes, getExpenses, incomes, expenses } =
     useTransactionsContext();
 
   useEffect(() => {
     getIncomes();
     getExpenses();
   }, []);
+
+  const [selectedMonth, setSelectedMonth] = useState(null);
+  const [availableMonths, setAvailableMonths] = useState([]);
+  const getMonthName = (month) => {
+    const monthNames = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+    return monthNames[month];
+  };
+
+  useEffect(() => {
+    const allMonths = [
+      ...new Set(
+        [...incomes, ...expenses].map((transaction) =>
+          new Date(transaction.date).getMonth()
+        )
+      ),
+    ];
+    const sortedMonths = allMonths.sort((a, b) => a - b);
+    setAvailableMonths(sortedMonths);
+  }, [incomes, expenses]);
+
+  const handleMonthChange = (event) => {
+    const selectedValue = parseInt(event.target.value, 10);
+    setSelectedMonth(selectedValue === -1 ? null : selectedValue);
+  };
 
   const formatAmount = (amount) => {
     return parseFloat(amount).toLocaleString("en-US", {
@@ -21,23 +58,65 @@ function DashboardForm() {
     });
   };
 
+  const getTransactionsForSelectedMonth = () => {
+    if (selectedMonth === null) return [...incomes, ...expenses];
+
+    return [...incomes, ...expenses].filter(transaction => new Date(transaction.date).getMonth() === selectedMonth);
+  };
+
+  const getTotalIncomeForSelectedMonth = () => {
+    const transactions = getTransactionsForSelectedMonth().filter(transaction => transaction.expenses === false);
+    const totalIncome = transactions.reduce((total, transaction) => total + parseFloat(transaction.amount), 0);
+    return totalIncome;
+  };
+  
+  const getTotalExpensesForSelectedMonth = () => {
+    const transactions = getTransactionsForSelectedMonth().filter(transaction => transaction.expenses === true);
+    const totalExpenses = transactions.reduce((total, transaction) => total + parseFloat(transaction.amount), 0);
+    return totalExpenses;
+  };
+  
+  const getTotalBalanceForSelectedMonth = () => {
+    const totalIncome = getTotalIncomeForSelectedMonth();
+    const totalExpenses = getTotalExpensesForSelectedMonth();
+    const totalBalance = totalIncome - totalExpenses;
+    return totalBalance;
+  };
+
+
   return (
     <DashboardStyled>
       <InnerLayout>
-        <h1>Overview</h1>
+      <div className="header">
+          <h1>Overview</h1>
+          <div className="select-container">
+            <select
+              onChange={handleMonthChange}
+              value={selectedMonth === null ? -1 : selectedMonth}
+              className="select"
+            >
+              <option value={-1}>All Months</option>
+              {availableMonths.map((month, index) => (
+                <option key={index} value={month}>
+                  {getMonthName(month)}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
         <div className="stats-con">
           <div className="amount-con">
             <div className="income">
               <h2>Total Income</h2>
-              <p>{formatAmount(totalIncome())}</p>
+              <p>{formatAmount(getTotalIncomeForSelectedMonth())}</p>
             </div>
             <div className="expense">
               <h2>Total Expense</h2>
-              <p>{formatAmount(totalExpenses())}</p>
+              <p>{formatAmount(getTotalExpensesForSelectedMonth())}</p>
             </div>
             <div className="balance">
               <h2>Total Balance</h2>
-              <p>{totalBalance()}</p>
+              <p>{formatAmount(getTotalBalanceForSelectedMonth())}</p>
             </div>
           </div>
         </div>
@@ -59,13 +138,28 @@ function DashboardForm() {
 const DashboardStyled = styled.div`
   height: 100%;
   position: relative;
+  display: flex;
+  overflow: auto;
+  flex-direction: column;
+  .header {
+    display: flex;
+    align-items: center;
+  }
+
+  .select-container {
+    margin-left: 1rem; 
+  }
+
+  .select {
+    width: 100%; 
+  }
 
   h1 {
     color: rgba(34, 34, 126, 1);
   }
 
   .chart-con {
-    margin-top: 5rem;
+    margin-top: 3rem;
     display: flex;
     gap: 3rem;
 
@@ -85,13 +179,13 @@ const DashboardStyled = styled.div`
 
   .stats-con {
     display: flex;
-    gap: 2rem;
+    gap: 1rem;
 
     .amount-con {
       display: flex;
-      gap: 4rem;
+      gap: 2rem;
       flex-direction: row;
-      margin-top: 2rem;
+      margin-top: 1rem;
 
       .income,
       .expense,

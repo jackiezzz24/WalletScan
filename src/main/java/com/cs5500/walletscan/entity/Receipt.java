@@ -1,4 +1,4 @@
-package com.cs5500.walletscan.model;
+package com.cs5500.walletscan.entity;
 
 public class Receipt {
 
@@ -12,6 +12,18 @@ public class Receipt {
         this.storeName = builder.storeName;
         this.total = builder.total;
         this.date = builder.date;
+    }
+
+    public String getStoreName() {
+        return storeName;
+    }
+
+    public double getTotal() {
+        return total;
+    }
+
+    public String getDate() {
+        return date;
     }
 
     public static class Builder {

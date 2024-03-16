@@ -109,7 +109,7 @@ function RightPanel({ active, setActive, setShowForm }) {
 
 const RightPanelStyled = styled.nav`
   padding: 3rem 0rem;
-  width: 20vw;
+  width: 18vw;
   height: 400px;
   background: rgba(252, 246, 249, 0.78);
   border: 3px solid #ffffff;
@@ -195,26 +195,26 @@ const RightPanelStyled = styled.nav`
   }
 
   .button {
-    margin-top: 90px;
-    background-color: rgba(34, 34, 126, 1);
+    margin-top: 50px;
+    background-color: rgba(34, 34, 126, 0.9);
     color: white;
     border: none;
     padding: 35px 20px;
     text-align: center;
     text-decoration: none;
-    font-size: 2rem;
+    font-size: 1.5rem;
     cursor: pointer;
     border-radius: 20px;
   }
   .report-btn {
     margin-top: 10px;
-    background-color: rgba(34, 34, 126, 1);
+    background-color: rgba(34, 34, 126, 0.9);
     color: white;
     border: none;
     padding: 35px 20px;
     text-align: center;
     text-decoration: none;
-    font-size: 2rem;
+    font-size: 1.5rem;
     cursor: pointer;
     border-radius: 20px;
   }
