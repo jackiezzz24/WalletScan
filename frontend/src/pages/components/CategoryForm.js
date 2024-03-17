@@ -93,7 +93,7 @@ function CategoryForm() {
 
   const renderCategoryItems = () => {
     return allCategories.map((category) => {
-      const total = calculateCategoryTotal(category);
+      calculateCategoryTotal(category);
       return (
         <div
           key={category}
