@@ -91,7 +91,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/jakarta.annotation/jakarta.annotation-api -->
 		<dependency>
 			<groupId>jakarta.annotation</groupId>
 			<artifactId>jakarta.annotation-api</artifactId>
@@ -157,7 +156,6 @@
 			<artifactId>poi-ooxml</artifactId>
 			<version>5.2.5</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.apache.ibatis/ibatis-core -->
 		<dependency>
 			<groupId>org.apache.ibatis</groupId>
 			<artifactId>ibatis-core</artifactId>
@@ -172,7 +170,6 @@
 			<artifactId>apiguardian-api</artifactId>
 			<version>1.1.2</version>
 		</dependency>
-
 	</dependencies>
 
 	<build>
