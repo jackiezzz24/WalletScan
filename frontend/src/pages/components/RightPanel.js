@@ -100,7 +100,7 @@ function RightPanel({ active, setActive, setShowForm }) {
       <button className="report-btn" onClick={() => {
        downloadFile();
       }}>
-        <i class="fa-solid fa-table-list" style={{ marginRight: "8px" }}></i>
+        <i className="fa-solid fa-table-list" style={{ marginRight: "8px" }}></i>
         Generate Report
       </button>
     </RightPanelStyled>

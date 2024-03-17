@@ -45,7 +45,7 @@ function Navbar() {
         <div className="navbar-container">
           <Link to="/" className="navbar-logo" onClick={closeMobileMenu}>
             WalletScan
-            <i class="fa-solid fa-qrcode fa-fw" />
+            <i className="fa-solid fa-qrcode fa-fw" />
           </Link>
           <div className="menu-icon" onClick={handleClick}>
             <i className={click ? "fas fa-times" : "fas fa-bars"} />
