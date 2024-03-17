@@ -123,7 +123,7 @@ function History() {
               } = transaction;
               return (
                 <TransactionItem
-                  key={_id}
+                  key={transaction.id}
                   id={_id}
                   merchant={merchant}
                   description={description}
@@ -132,7 +132,7 @@ function History() {
                   expenses={expenses}
                   category={category}
                   indicatorColor={expenses ? "#FF5050" : "#5CB85C"}
-                  deleteItem={() => deleteTrans(_id)}
+                  deleteItem={() => deleteTrans(transaction.id)}
                 />
               );
             })}

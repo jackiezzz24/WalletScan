@@ -1,5 +1,6 @@
 package com.cs5500.walletscan.service.impl;
 
+import com.cs5500.walletscan.Utils.ExcelUtils;
 import com.cs5500.walletscan.controller.TransactionController;
 import com.cs5500.walletscan.dto.ResponseDto;
 import com.cs5500.walletscan.dto.TransactionsDto;
@@ -9,6 +10,7 @@ import com.cs5500.walletscan.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
@@ -65,10 +67,12 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public List<Transaction> alltrans() {
-        return transactionRepository.findAll();
+    public List<File> zipExcelFileFromDatabase() throws Exception {
+        List<Transaction> customers = transactionRepository.findAll();
+        String fileName = "Customer_Export" + ".xlsx";
+        List<File> resultFiles = ExcelUtils.getFilesExcelStoreDataFromDatabase(customers, fileName);
+        return resultFiles;
     }
-
 
     private Transaction mapDtoToEntity(TransactionsDto transactionsDto, Long userId) {
         Transaction transaction = new Transaction();
