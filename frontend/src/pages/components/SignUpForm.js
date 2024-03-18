@@ -110,7 +110,7 @@ function SignUpForm() {
             onChange={(event) => {
               setUsernameLogin(event.target.value);
             }}
-          />
+            data-testid="username-input" />
           <Input
             type="password"
             name="password"
