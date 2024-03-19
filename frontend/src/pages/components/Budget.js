@@ -140,6 +140,7 @@ function Budget() {
               onChange={handleMonthChange}
               value={selectedMonth === null ? -1 : selectedMonth}
               className="select"
+              style={{ fontSize: "16px" }}
             >
               {availableMonths.map((month, index) => (
                 <option key={index} value={month}>
@@ -235,10 +236,11 @@ const BudgetStyled = styled.div`
   .stats-con {
     display: flex;
     gap: 1rem;
+    justify-content: center;
 
     .amount-con {
       display: flex;
-      gap: 1rem;
+      gap: 5rem;
       flex-direction: row;
 
       .spend,

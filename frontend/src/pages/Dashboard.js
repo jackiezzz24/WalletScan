@@ -1,5 +1,5 @@
 import DashboardForm from "./components/DashboarForm";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import styled from "styled-components";
 import { MainLayout } from "./components/utils/Layout";
 import Orb from "./components/utils/Orb";
@@ -17,6 +17,35 @@ import History from "./components/History";
 function Dashboard() {
   const [active, setActive] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [user, setUser] = useState(null);
+  const authToken = localStorage.getItem("authToken");
+
+  const getUserProfile = async () => {
+    try {
+      const baseUrl = process.env.REACT_APP_API;
+      const response = await fetch(`${baseUrl}/auth/profile`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        const { username, id } = result;
+        setUser({ ...result, username, id });
+      } else {
+        alert(`${result.error}`);
+      }
+    } catch (error) {
+      alert("An error occurred during fetch: " + error.message);
+    }
+  };
+
+  useEffect(() => {
+    getUserProfile();
+  }, []);
 
   const global = useTransactionsContext();
   console.log(global);
@@ -76,7 +105,7 @@ function Dashboard() {
 }
 
 const DashboardStyled = styled.div`
-  height: 760px;
+  height: 820px;
   position: relative;
   main {
     flex: 1;

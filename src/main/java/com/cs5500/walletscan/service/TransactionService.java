@@ -12,7 +12,5 @@ public interface TransactionService {
     List<Transaction> getIncome(Long userId);
     List<Transaction> getExpense(Long userId);
     ResponseDto delete(Long id);
-//    List<Transaction> alltrans();
-    List<File> zipExcelFileFromDatabase() throws Exception;
 
 }

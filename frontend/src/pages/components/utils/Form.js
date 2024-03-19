@@ -49,6 +49,9 @@ function Form() {
     "Other",
   ];
 
+  const { merchant, amount, currency, expenses, date, category, description } =
+    inputState;
+
   const getUserProfile = async () => {
     try {
       const baseUrl = process.env.REACT_APP_API;
@@ -62,8 +65,12 @@ function Form() {
 
       const result = await response.json();
       if (response.ok) {
-        const { username, id } = result;
+        const { username, id, currency } = result;
         setUser({ ...result, username, id });
+        setInputState((prevState) => ({
+          ...prevState,
+          currency: currency,
+        }));
       } else {
         alert(`${result.error}`);
       }
@@ -76,20 +83,26 @@ function Form() {
     getUserProfile();
   }, []);
 
-  const { merchant, amount, currency, expenses, date, category, description } =
-    inputState;
-
   const handleInput = (name) => (e) => {
     const value = e.target.value;
-
+  
     setInputState((prevState) => {
-      if (name === "expenses") {
-        return { ...prevState, [name]: value === "true" };
-      } else {
-        return { ...prevState, [name]: value };
+      let updatedState = {
+        ...prevState,
+        [name]: name === "expenses" ? value === "true" : value,
+      };
+  
+      // Update description if merchant or category is changed
+      if (name === "merchant" || name === "category") {
+        updatedState = {
+          ...updatedState,
+          description: `${updatedState.merchant} ${updatedState.category}`,
+        };
       }
+  
+      return updatedState;
     });
-
+  
     setError("");
   };
 
@@ -121,7 +134,7 @@ function Form() {
       console.log(responseData); // Add this line
       const { merchant, amount, date } = responseData;
       const timeValue = dateStringToTimeValue(date);
-      setInputState(prevState => ({
+      setInputState((prevState) => ({
         ...prevState,
         merchant: merchant,
         amount: amount,
@@ -146,11 +159,11 @@ function Form() {
     if (!file) {
       throw new Error("No image selected for upload.");
     }
-  
+
     const formData = new FormData();
     formData.append("file", file);
     formData.append("upload_preset", "ml_default");
-  
+
     try {
       const cloudinaryResponse = await fetch(
         `https://api.cloudinary.com/v1_1/dxhu2wrmc/image/upload`,
@@ -159,21 +172,22 @@ function Form() {
           body: formData,
         }
       );
-  
+
       if (!cloudinaryResponse.ok) {
         const cloudinaryResult = await cloudinaryResponse.json();
-        throw new Error(`Cloudinary upload error: ${cloudinaryResult.error?.message}`);
+        throw new Error(
+          `Cloudinary upload error: ${cloudinaryResult.error?.message}`
+        );
       }
-  
+
       const cloudinaryResult = await cloudinaryResponse.json();
       return cloudinaryResult.secure_url;
     } catch (error) {
       throw new Error(`Error uploading image to Cloudinary: ${error.message}`);
     }
   };
-  
-  const handleFileChange = async (e) => {
 
+  const handleFileChange = async (e) => {
     if (!user) {
       console.error("User object is not available");
       return;
@@ -184,7 +198,7 @@ function Form() {
       setPreviewImage(null);
       return;
     }
-  
+
     // Generate a preview of the selected file
     const reader = new FileReader();
     reader.onloadend = () => {
@@ -198,7 +212,7 @@ function Form() {
       if (!cloudinaryUrl) {
         throw new Error("Failed to upload image to Cloudinary.");
       }
-  
+
       // Process the image with OCR and update the form state
       await readImage(cloudinaryUrl);
     } catch (error) {
@@ -215,7 +229,7 @@ function Form() {
     <FormStyled onSubmit={handleSubmit}>
       <div className="inputItem">
         <div className="input-control">
-        <input
+          <input
             value={merchant}
             type="text"
             name={"merchant"}

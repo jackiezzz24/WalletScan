@@ -6,6 +6,7 @@ import Home from "./pages/Home";
 import SignUp from "./pages/SignUp";
 import Dashboard from "./pages/Dashboard";
 import { TransactionProvider } from "./pages/components/TransactionContext";
+import Loading from "./pages/components/Loading";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/register" element={<SignUp />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/loading" element={<Loading />} />
       </Routes>
     </Router>
   </TransactionProvider>
