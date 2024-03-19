@@ -1,40 +1,35 @@
 package com.cs5500.walletscan.controller;
 
 
-import cn.afterturn.easypoi.entity.vo.NormalExcelConstants;
-import cn.afterturn.easypoi.excel.entity.ExportParams;
-import cn.afterturn.easypoi.excel.entity.enmus.ExcelType;
-import cn.afterturn.easypoi.view.PoiBaseView;
-import cn.hutool.core.io.IoUtil;
-import cn.hutool.poi.excel.ExcelUtil;
-import cn.hutool.poi.excel.ExcelWriter;
-import com.alibaba.excel.EasyExcel;
-import com.cs5500.walletscan.config.DownExcel;
-import com.cs5500.walletscan.mapper.TransMapper;
+import com.cs5500.walletscan.Utils.ExcelUtils;
+import com.cs5500.walletscan.repository.TransactionRepository;
 import com.cs5500.walletscan.service.UserService;
-import com.cs5500.walletscan.mapper.TransMapper;
 import jakarta.annotation.Resource;
-import org.apache.poi.hssf.usermodel.*;
 import com.cs5500.walletscan.dto.ResponseDto;
 import com.cs5500.walletscan.dto.TransactionsDto;
 import com.cs5500.walletscan.entity.Transaction;
 import com.cs5500.walletscan.service.TransactionService;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.ModelMap;
+
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import java.io.ByteArrayInputStream;
 
-import java.io.OutputStream;
-import java.io.PrintWriter;
+import java.io.IOException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
+
 
 @RestController
 @CrossOrigin
@@ -44,7 +39,10 @@ public class TransactionController {
     @Resource
     @Autowired
     private TransactionService transactionService;
+    private TransactionRepository transactionRepository;
     private UserService userService;
+
+
 
     @PostMapping("/{userId}/add")
     public ResponseEntity<ResponseDto> addTransaction
@@ -82,12 +80,31 @@ public class TransactionController {
     public List<Transaction> getAllExpensesForUser(@PathVariable Long userid) {
         return transactionService.getExpense(userid);
     }
+
+
     //导出为Excel
-    @RequestMapping("/downloadexcel.do")
-    public void getExcel(HttpServletResponse response) throws IllegalAccessException, IOException,
-            InstantiationException {
-        List<Transaction> list = transactionService.alltrans();
-        DownExcel.download((jakarta.servlet.http.HttpServletResponse) response,Transaction.class,list);
+
+    @GetMapping("/export")
+    public ResponseEntity<org.springframework.core.io.Resource> export() throws Exception {
+        List<Transaction> transactions = transactionRepository.findAll();
+
+        if (!CollectionUtils.isEmpty(transactions)) {
+            String fileName = "Transactions export" + ".xlsx";
+
+            ByteArrayInputStream in = ExcelUtils.exportCustomer(transactions, fileName);
+
+            InputStreamResource inputStreamResource = new InputStreamResource(in);
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION,
+                            "attachment; filename=" + URLEncoder.encode(fileName, StandardCharsets.UTF_8)
+                    )
+                    .contentType(MediaType.parseMediaType("application/vnd.ms-excel; charset=UTF-8"))
+                    .body(inputStreamResource);
+        } else {
+            throw new Exception("No data");
+
+        }
     }
 
 }

@@ -26,7 +26,7 @@ function Form() {
     description: "",
     userid: "",
     receipt_img: "",
-  }, console.log('render'));
+  });
   const currencies = ["USD", "CAD", "CNY", "EUR", "GBP", "JPY"];
   const expenseCategories = [
     "Education",
@@ -94,42 +94,10 @@ function Form() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!user) {
-      console.error("User object is not available");
-      return;
-    }
-
-    setInputState((prevInputState) => ({
-      ...prevInputState,
-      userid: user.id,
-    }));
-
-    try {
-      let cloudinaryUrl = null;
-
-      if (previewImage) {
-        cloudinaryUrl = await uploadImageToCloudinary();
-      }
-
-      // Capture the response from readImage function
-      await readImage(cloudinaryUrl);
-
-      setInputState((prevInputState) => ({
-        ...prevInputState,
-        receipt_img: cloudinaryUrl || "",
-      }));
-
-      console.log("Submitting form with inputState:", inputState);
-
-      if (expenses) {
-        addTrans(inputState);
-      } else {
-        addTrans(inputState);
-      }
-    } catch (submitError) {
-      setError(`Form submission error: ${submitError.message}`);
+    if (expenses) {
+      addTrans(inputState);
+    } else {
+      addTrans(inputState);
     }
   };
 
@@ -150,74 +118,92 @@ function Form() {
       }
       // Parse the JSON response and return the relevant data
       const responseData = await response.json();
+      console.log(responseData); // Add this line
       const { merchant, amount, date } = responseData;
-      setInputState((prevInputState) => {
-        const updatedState = {
-          ...prevInputState,
-          merchant: merchant,
-          amount: amount,
-          currency: "",
-          expenses: true,
-          date: "",
-          category: "",
-          description: "",
-          userid: "",
-          receipt_img: "",
-        };
-        console.log("Updated state:", updatedState);
-        return updatedState;
-      });
+      const timeValue = dateStringToTimeValue(date);
+      setInputState(prevState => ({
+        ...prevState,
+        merchant: merchant,
+        amount: amount,
+        date: timeValue,
+      }));
     } catch (error) {
       throw new Error(`Error reading image: ${error.message}`);
     }
   };
 
-  const uploadImageToCloudinary = async () => {
-    if (previewImage) {
-      const formData = new FormData();
-      formData.append("file", previewImage);
-      formData.append("upload_preset", "ml_default");
+  function dateStringToTimeValue(dateString) {
+    const parts = dateString.split("/");
+    let year = parseInt(parts[2], 10);
+    year += year < 100 ? 2000 : 0;
+    const month = parseInt(parts[1], 10) - 1;
+    const day = parseInt(parts[0], 10);
+    const date = new Date(year, month, day);
+    return date.getTime();
+  }
 
-      try {
-        const cloudinaryResponse = await fetch(
-          `https://api.cloudinary.com/v1_1/dxhu2wrmc/image/upload`,
-          {
-            method: "POST",
-            body: formData,
-          }
-        );
-
-        if (cloudinaryResponse.ok) {
-          const cloudinaryResult = await cloudinaryResponse.json();
-          return cloudinaryResult.secure_url;
-        } else {
-          const cloudinaryResult = await cloudinaryResponse.json();
-          throw new Error(
-            `Cloudinary upload error: ${cloudinaryResult.error.message}`
-          );
-        }
-      } catch (error) {
-        throw new Error(
-          `Error uploading image to Cloudinary: ${error.message}`
-        );
-      }
-    } else {
+  const uploadImageToCloudinary = async (file) => {
+    if (!file) {
       throw new Error("No image selected for upload.");
     }
+  
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "ml_default");
+  
+    try {
+      const cloudinaryResponse = await fetch(
+        `https://api.cloudinary.com/v1_1/dxhu2wrmc/image/upload`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+  
+      if (!cloudinaryResponse.ok) {
+        const cloudinaryResult = await cloudinaryResponse.json();
+        throw new Error(`Cloudinary upload error: ${cloudinaryResult.error?.message}`);
+      }
+  
+      const cloudinaryResult = await cloudinaryResponse.json();
+      return cloudinaryResult.secure_url;
+    } catch (error) {
+      throw new Error(`Error uploading image to Cloudinary: ${error.message}`);
+    }
   };
+  
+  const handleFileChange = async (e) => {
 
-  const handleFileChange = (e) => {
+    if (!user) {
+      console.error("User object is not available");
+      return;
+    }
+
     const selectedFile = e.target.files[0];
-    setReceiptImage(selectedFile);
-
-    if (selectedFile) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewImage(reader.result);
-      };
-      reader.readAsDataURL(selectedFile);
-    } else {
+    if (!selectedFile) {
       setPreviewImage(null);
+      return;
+    }
+  
+    // Generate a preview of the selected file
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreviewImage(reader.result);
+    };
+    reader.readAsDataURL(selectedFile);
+
+    try {
+      // Upload the image to Cloudinary and wait for the URL
+      const cloudinaryUrl = await uploadImageToCloudinary(selectedFile);
+      if (!cloudinaryUrl) {
+        throw new Error("Failed to upload image to Cloudinary.");
+      }
+  
+      // Process the image with OCR and update the form state
+      await readImage(cloudinaryUrl);
+    } catch (error) {
+      console.error("Error processing file change:", error.message);
+      setError(`Form submission error: ${error.message}`);
     }
   };
 
@@ -229,11 +215,11 @@ function Form() {
     <FormStyled onSubmit={handleSubmit}>
       <div className="inputItem">
         <div className="input-control">
-          <input
+        <input
+            value={merchant}
             type="text"
-            value={inputState.merchant}
             name={"merchant"}
-            placeholder="Merchant"
+            placeholder={"Merchant"}
             onChange={handleInput("merchant")}
           />
         </div>
