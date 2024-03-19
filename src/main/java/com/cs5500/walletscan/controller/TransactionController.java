@@ -14,12 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import org.springframework.core.io.Resource;
 
@@ -93,7 +89,7 @@ public class TransactionController {
         try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("Transactions");
             CreationHelper creationHelper = workbook.getCreationHelper();
-            short dateFormat = creationHelper.createDataFormat().getFormat("yyyy-MM-dd");
+            creationHelper.createDataFormat().getFormat("yyyy-MM-dd");
 
             // Create header row
             Row headerRow = sheet.createRow(0);
@@ -112,7 +108,7 @@ public class TransactionController {
                 row.createCell(1).setCellValue(transaction.getId());
                 Cell dateCell = row.createCell(2);
                 dateCell.setCellValue(transaction.getDate());
-                dateCell.setCellStyle(createDateCellStyle(workbook)); // Apply date format
+                dateCell.setCellStyle(createDateCellStyle(workbook));
                 row.createCell(3).setCellValue(transaction.getCategory());
                 row.createCell(4).setCellValue(transaction.getMerchant());
                 row.createCell(5).setCellValue(transaction.getCurrency());

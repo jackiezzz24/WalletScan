@@ -1,7 +1,6 @@
 package com.cs5500.walletscan.entity;
 
 public class Receipt {
-
     private String storeName;
 
     private double total;

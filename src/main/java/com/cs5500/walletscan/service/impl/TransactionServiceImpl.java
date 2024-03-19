@@ -7,8 +7,6 @@ import com.cs5500.walletscan.repository.TransactionRepository;
 import com.cs5500.walletscan.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
