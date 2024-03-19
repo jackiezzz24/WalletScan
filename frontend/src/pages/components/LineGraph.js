@@ -139,6 +139,7 @@ const data = {
         id="monthSelect"
         onChange={handleMonthChange}
         value={selectedMonth === null ? -1 : selectedMonth}
+        style={{ fontSize: "16px" }}
       >
         <option value={-1}>All Months</option>
         {availableMonths.map((month, index) => (

@@ -94,6 +94,7 @@ function DashboardForm() {
               onChange={handleMonthChange}
               value={selectedMonth === null ? -1 : selectedMonth}
               className="select"
+              style={{ fontSize: "16px" }}
             >
               <option value={-1}>All Months</option>
               {availableMonths.map((month, index) => (
@@ -180,12 +181,14 @@ const DashboardStyled = styled.div`
   .stats-con {
     display: flex;
     gap: 1rem;
+    justify-content: center;
 
     .amount-con {
       display: flex;
       gap: 2rem;
       flex-direction: row;
       margin-top: 1rem;
+      justify-content: center;
 
       .income,
       .expense,

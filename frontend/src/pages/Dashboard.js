@@ -105,7 +105,7 @@ function Dashboard() {
 }
 
 const DashboardStyled = styled.div`
-  height: 760px;
+  height: 820px;
   position: relative;
   main {
     flex: 1;

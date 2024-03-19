@@ -84,7 +84,7 @@ function SignUpForm() {
         // Save the token to localStorage
         localStorage.setItem("authToken", result.token);
         alert(result.message);
-        navigate("/dashboard");
+        navigate("/loading");
       } else {
         handleAuthError(result);
       }

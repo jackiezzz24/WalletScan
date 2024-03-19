@@ -112,7 +112,6 @@ export const TransactionProvider = ({ children }) => {
   };
 
   const deleteTrans = async (id) => {
-    alert("Transaction ID to delete:", id);
     try {
       const response = await fetch(
         `${baseUrl}/transaction/${id}/delete`,

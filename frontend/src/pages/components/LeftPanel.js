@@ -26,7 +26,7 @@ function LeftPanel({ active, setActive }) {
 const LeftPanelStyled = styled.nav`
   padding: 5rem 0rem;
   width: 15vw;
-  height: 700px;
+  height: 760px;
   background: rgba(252, 246, 249, 0.78);
   border: 3px solid #ffffff;
   backdrop-filter: blur(4.5px);
