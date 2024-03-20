@@ -31,7 +31,7 @@ public class UserServiceImpl implements UserService {
     private ValidationUtils validationUtils;
 
     @Override
-    public ResponseDto signUp(ResponseDto signupRequest){
+    public ResponseDto signUp(ResponseDto signupRequest) {
         ResponseDto response = new ResponseDto();
         try {
             String email = signupRequest.getEmail();
@@ -66,7 +66,7 @@ public class UserServiceImpl implements UserService {
                 response.setStatusCode(200);
                 subscribeService.saveSubscribe(savedUser.getEmail());
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             response.setStatusCode(500);
             response.setError(e.getMessage());
         }
@@ -74,7 +74,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseDto signIn(ResponseDto signinRequest){
+    public ResponseDto signIn(ResponseDto signinRequest) {
         ResponseDto response = new ResponseDto();
 
         try {
@@ -93,9 +93,10 @@ public class UserServiceImpl implements UserService {
             var jwt = jwtUtils.generateToken(user);
             response.setStatusCode(200);
             response.setToken(jwt);
+            response.setUser(user);
             response.setExpirationTime("24Hr");
             response.setMessage("Successfully Signed In");
-        } catch (Exception e){
+        } catch (Exception e) {
             response.setStatusCode(500);
             response.setError(e.getMessage());
         }

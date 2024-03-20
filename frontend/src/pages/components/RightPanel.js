@@ -7,44 +7,19 @@ import { useProfileContext } from './ProfileContext';
 function RightPanel({ active, setActive, setShowForm }) {
 
   const [user, setUser] = useState(null);
-  const authToken = localStorage.getItem('authToken');
   const { profileImageUrl  } = useProfileContext();
   const [loading, setLoading] = useState(false);
 
-  const getUserProfile = async () => {
-    try {
-      const baseUrl = process.env.REACT_APP_API;
-      const response = await fetch(`${baseUrl}/auth/profile`, {
-        method: "GET",
-        headers: {
-          "Authorization": `Bearer ${authToken}`,
-          "Content-Type": "application/json",
-        }
-      });
-
-      const result = await response.json();
-      if (response.ok) {
-        const { username, id } = result;
-        setUser({ ...result, username, id });
-      } else {
-        alert(`${result.error}`);
-      }
-    } catch (error) {
-      alert("An error occurred during fetch: " + error.message);
+  useEffect(() => {
+    const userObject = JSON.parse(localStorage.getItem("user"));
+    setUser(userObject);
+    if (userObject) {
+      setUser((prevUser) => ({
+        ...prevUser,
+        profile_img: profileImageUrl || prevUser.profile_img,
+      }));
     }
-  };
-
-  useEffect(() => {
-    getUserProfile();
-  },[]);
-
-  useEffect(() => {
-    setUser((prevUser) => ({
-      ...prevUser,
-      profile_img: profileImageUrl,
-    }));
   }, [profileImageUrl]);
-
 
   const downloadFile = async() => {
     setLoading(true);

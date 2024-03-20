@@ -4,42 +4,28 @@ import { InnerLayout } from "./utils/Layout";
 import Switch from "react-switch";
 
 function Settings() {
-  const [user, setUser] = useState({
-    budget: "0",
-    currency: "USD",
-    subscribe: true,
-    notification: true,
-  });
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   const authToken = localStorage.getItem("authToken");
   const [editingField, setEditingField] = useState(null);
   const currencies = ["USD", "CAD", "CNY", "EUR", "GBP", "JPY"];
   const baseUrl = process.env.REACT_APP_API;
 
-  const getUserProfile = async () => {
-    try {
-      const response = await fetch(`${baseUrl}/auth/profile`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      const result = await response.json();
-      if (response.ok) {
-        const { username } = result;
-        setUser({ ...result, username });
-      } else {
-        alert(`${result.error}`);
-      }
-    } catch (error) {
-      alert("An error occurred during fetch: " + error.message);
-    }
-  };
+  useEffect(() => {
+    const userObject = JSON.parse(localStorage.getItem("user"));
+    setUser(userObject);
+    setLoading(false);
+  }, []); 
 
   useEffect(() => {
-    getUserProfile();
-  }, []);
+    if (user) {
+      localStorage.setItem("user", JSON.stringify(user));
+    }
+  }, [user]);
+
+  if (loading) {
+    return; 
+  }
 
   const handleSubscribeToggle = async (checked) => {
     setUser((prevUser) => ({ ...prevUser, subscribe: checked }));
@@ -118,7 +104,7 @@ function Settings() {
       }
       alert("Profile updated successfully");
       setEditingField(null);
-      getUserProfile();
+      //getUserProfile();
     } catch (error) {
       alert("An error occurred during update: " + error.message);
     }
@@ -167,7 +153,7 @@ function Settings() {
               </>
             ) : (
               <p onClick={() => handleEditStart("budget")}>
-                {parseInt(user.budget).toLocaleString()}
+                {parseFloat(user.budget).toLocaleString()}
               </p>
             )}
           </div>
@@ -201,7 +187,7 @@ function Settings() {
             )}
           </div>
           <div className="item">
-            <h4>Substribe Marketing Emails</h4>
+            <h4>Subscribe Marketing Emails</h4>
             <Switch
               onChange={handleSubscribeToggle}
               checked={user.subscribe}

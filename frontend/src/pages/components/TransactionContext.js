@@ -7,38 +7,32 @@ export const TransactionProvider = ({ children }) => {
   const [incomes, setIncomes] = useState([]);
   const [expenses, setExpenses] = useState([]);
   const [error, setError] = useState(null);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    const userObject = JSON.parse(localStorage.getItem("user"));
+    return userObject || {}; 
+  });
   const authToken = localStorage.getItem("authToken");
 
-  const getUserProfile = async () => {
-    try {
-      const baseUrl = process.env.REACT_APP_API;
-      const response = await fetch(`${baseUrl}/auth/profile`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      const result = await response.json();
-      if (response.ok) {
-        const { username, id } = result;
-        setUser({ ...result, username, id });
-      } else {
-        alert(`${result.error}`);
-      }
-    } catch (error) {
-      alert("An error occurred during fetch: " + error.message);
-    }
-  };
-
   useEffect(() => {
-    getUserProfile();
-  }, []);
+    const handleStorageChange = () => {
+      const userObject = JSON.parse(localStorage.getItem("user"));
+      setUser(userObject);
+    };
+  
+    window.addEventListener("storage", handleStorageChange);
+  
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []); 
+
+  console.log(user);
 
   const addTrans = async (input) => {
     try {
+      if (!user) {
+        throw new Error("User object is null");
+      }
       const response = await fetch(`${baseUrl}/transaction/${user.id}/add`, {
         method: "POST",
         headers: {
@@ -61,6 +55,9 @@ export const TransactionProvider = ({ children }) => {
 
   const getIncomes = async () => {
     try {
+      if (!user) {
+        throw new Error("User object is null");
+      }
       const response = await fetch(
         `${baseUrl}/transaction/incomes/${user.id}`,
         {
@@ -87,6 +84,9 @@ export const TransactionProvider = ({ children }) => {
 
   const getExpenses = async () => {
     try {
+      if (!user) {
+        throw new Error("User object is null");
+      }
       const response = await fetch(
         `${baseUrl}/transaction/expenses/${user.id}`,
         {
@@ -113,15 +113,15 @@ export const TransactionProvider = ({ children }) => {
 
   const deleteTrans = async (id) => {
     try {
-      const response = await fetch(
-        `${baseUrl}/transaction/${id}/delete`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      if (!user) {
+        throw new Error("User object is null");
+      }
+      const response = await fetch(`${baseUrl}/transaction/${id}/delete`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       if (!response.ok) {
         const result = await response.json();
@@ -194,6 +194,7 @@ export const TransactionProvider = ({ children }) => {
         transactionHistory,
         error,
         setError,
+        user
       }}
     >
       {children}

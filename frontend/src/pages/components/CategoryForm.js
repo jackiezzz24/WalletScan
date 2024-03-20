@@ -150,10 +150,8 @@ function CategoryForm() {
         </div>
        <div className="amount-con">
           <div className={`category-container ${isExpanded ? 'expanded' : ''}`}>
-            {/* Render your category items here */}
             {renderCategoryItems()}
           </div>
-          {/* Show the expand/collapse icon */}
           {allCategories.length > 4 && (
             <div className="toggle-icon" onClick={toggleExpansion}>
               {isExpanded ? <span>-</span> : <span>+</span>}
