@@ -1,36 +1,21 @@
 import React, { useEffect, useState } from "react";
 import "./styles/Loading.css";
 import { useNavigate } from "react-router-dom";
+import { useTransactionsContext } from "./TransactionContext";
 
 function Loading() {
-  const [data, setData] = useState([]);
-  const [loading, setloading] = useState(undefined);
-  const [completed, setcompleted] = useState(undefined);
+  const [loading, setLoading] = useState(true);
+  const [completed, setCompleted] = useState(false);
   const navigate = useNavigate();
-  const authToken = localStorage.getItem("authToken");
+  const { user } = useTransactionsContext();
   const baseUrl = process.env.REACT_APP_API;
 
   useEffect(() => {
-    setTimeout(() => {
-      fetch(`${baseUrl}/auth/profile`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-          "Content-Type": "application/json",
-        },
-      })
-        .then((response) => response.json())
-        .then((json) => {
-          console.log(json);
-          setData(json);
-          setloading(true);
-
-          setTimeout(() => {
-            setcompleted(true);
-          }, 1000);
-        });
-    }, 2000);
-  }, []);
+    if (user) {
+      setLoading(false);
+      setCompleted(true);
+    }
+  }, [user]);
 
   useEffect(() => {
     if (completed) {

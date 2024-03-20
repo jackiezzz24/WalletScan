@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import styled, { keyframes } from "styled-components";
 import "../components/styles/SignUpForm.css";
 import { useNavigate } from "react-router-dom";
 
 function SignUpForm() {
   const [click, setClick] = useState(true);
-  const handleClick = () => setClick(!click);
+  const handleClick = useCallback(() => setClick(prevClick => !prevClick), []);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -37,7 +37,7 @@ function SignUpForm() {
       const result = await response.json();
       if (response.ok) {
         alert(result.message);
-        setClick(!click);
+        setClick(prevClick => !prevClick); 
       } else {
         handleAuthError(result);
       }
@@ -83,6 +83,7 @@ function SignUpForm() {
       if (response.ok) {
         // Save the token to localStorage
         localStorage.setItem("authToken", result.token);
+        localStorage.setItem("user", JSON.stringify(result.user));
         alert(result.message);
         navigate("/loading");
       } else {

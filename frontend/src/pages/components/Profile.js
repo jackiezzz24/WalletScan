@@ -21,10 +21,26 @@ function Profile() {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const { updateProfileImage } = useProfileContext();
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  const profileFinal = profile.map((item) => item.pview);
   const baseUrl = process.env.REACT_APP_API;
+
+  useEffect(() => {
+    const userObject = JSON.parse(localStorage.getItem("user"));
+    setUser(userObject);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem("user", JSON.stringify(user));
+    }
+  }, [user]);
+
+  if (loading) {
+    return; 
+  }
 
   const getUserProfile = async () => {
     try {
@@ -47,10 +63,6 @@ function Profile() {
       alert("An error occurred during fetch: " + error.message);
     }
   };
-
-  useEffect(() => {
-    getUserProfile();
-  }, []);
 
   const onClose = () => {
     setPview(null);
@@ -79,9 +91,11 @@ function Profile() {
         alert(`Failed to upload profile image: ${result.error}`);
         return;
       }
+      const updatedUser = { ...user, profile_img: imageUrl };
+      localStorage.setItem("user", JSON.stringify(updatedUser));
       alert("Profile image upload successfully");
-      getUserProfile();
       setImageCrop(false);
+      getUserProfile();
     } catch (error) {
       alert("An error occurred during update: " + error.message);
     }
@@ -131,13 +145,16 @@ function Profile() {
 
   const changePassword = async (oldPassword, newPassword) => {
     try {
-      const response = await fetch(`${baseUrl}/auth/password/${user.id}?oldPassword=${oldPassword}&newPassword=${newPassword}`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${baseUrl}/auth/password/${user.id}?oldPassword=${oldPassword}&newPassword=${newPassword}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            "Content-Type": "application/json",
+          },
         }
-      });
+      );
 
       if (!response.ok) {
         const result = await response.json();
@@ -146,7 +163,6 @@ function Profile() {
       }
 
       alert("Password changed successfully");
-      getUserProfile();
       setShowChangePassword(false);
       logout();
     } catch (error) {
@@ -156,8 +172,9 @@ function Profile() {
 
   const logout = () => {
     localStorage.removeItem("authToken");
+    localStorage.removeItem("user");
     navigate("/register");
-  }
+  };
 
   return (
     <ProfileStyled>
@@ -165,11 +182,7 @@ function Profile() {
         <h1>Profile</h1>
         <div className="user-con">
           <img
-            src={
-              profileFinal.length
-                ? profileFinal
-                : user?.profile_img || profile_image
-            }
+            src={user?.profile_img || profile_image}
             alt=""
             onClick={() => {
               setImageCrop(true);
@@ -250,7 +263,7 @@ function Profile() {
           <div className="change-password-content">
             <div className="passowrd-section">
               <label htmlFor="oldPassword">Old Password:</label>
-              <br/>
+              <br />
               <InputText
                 id="oldPassword"
                 type="password"
@@ -258,10 +271,10 @@ function Profile() {
                 onChange={(e) => setOldPassword(e.target.value)}
               />
             </div>
-            <br/>
+            <br />
             <div className="passowrd-section">
               <label htmlFor="newPassword">New Password:</label>
-              <br/>
+              <br />
               <InputText
                 id="newPassword"
                 type="password"

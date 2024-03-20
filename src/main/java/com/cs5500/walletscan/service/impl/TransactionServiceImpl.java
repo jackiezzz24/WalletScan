@@ -35,15 +35,10 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public ResponseDto delete(Long id) {
         ResponseDto response = new ResponseDto();
-            try {
-                // Assuming you have a method to find a transaction by ID
-                Optional<Transaction> transaction = transactionRepository.findById(id);
-                // Check if the transaction exists and belongs to the specified user
-                if (transaction.isPresent()) {
-                    // Delete the transaction
-                    transactionRepository.delete(transaction.get());
-                }
-                response.setMessage("Transaction deleted Successfully");
+        try {
+            Optional<Transaction> transaction = transactionRepository.findById(id);
+            transaction.ifPresent(value -> transactionRepository.delete(value));
+            response.setMessage("Transaction deleted Successfully");
             response.setStatusCode(200);
         } catch (Exception e) {
             response.setStatusCode(500);

@@ -13,15 +13,27 @@ function Form() {
   const [receiptImage, setReceiptImage] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
   const fileInputRef = useRef(null);
+  const [loading, setLoading] = useState(true);
 
-  const authToken = localStorage.getItem("authToken");
+  useEffect(() => {
+    const userObject = JSON.parse(localStorage.getItem("user"));
+    setUser(userObject);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    setInputState((prevState) => ({
+      ...prevState,
+      currency: user?.currency || "",
+    }));
+  }, [user]);
 
   const [inputState, setInputState] = useState({
     merchant: "",
     amount: "",
     currency: "",
     expenses: true,
-    date: "",
+    date: new Date(),
     category: "",
     description: "",
     userid: "",
@@ -51,37 +63,6 @@ function Form() {
 
   const { merchant, amount, currency, expenses, date, category, description } =
     inputState;
-
-  const getUserProfile = async () => {
-    try {
-      const baseUrl = process.env.REACT_APP_API;
-      const response = await fetch(`${baseUrl}/auth/profile`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      const result = await response.json();
-      if (response.ok) {
-        const { username, id, currency } = result;
-        setUser({ ...result, username, id });
-        setInputState((prevState) => ({
-          ...prevState,
-          currency: currency,
-        }));
-      } else {
-        alert(`${result.error}`);
-      }
-    } catch (error) {
-      alert("An error occurred during fetch: " + error.message);
-    }
-  };
-
-  useEffect(() => {
-    getUserProfile();
-  }, []);
 
   const handleInput = (name) => (e) => {
     const value = e.target.value;
