@@ -66,13 +66,13 @@ function Form() {
 
   const handleInput = (name) => (e) => {
     const value = e.target.value;
-  
+
     setInputState((prevState) => {
       let updatedState = {
         ...prevState,
-        [name]: name === "expenses" ? value === "true" : value,
+        [name]: name === "expenses" ? value === true : value,
       };
-  
+
       // Update description if merchant or category is changed
       if (name === "merchant" || name === "category") {
         updatedState = {
@@ -80,10 +80,10 @@ function Form() {
           description: `${updatedState.merchant} ${updatedState.category}`,
         };
       }
-  
+
       return updatedState;
     });
-  
+
     setError("");
   };
 
