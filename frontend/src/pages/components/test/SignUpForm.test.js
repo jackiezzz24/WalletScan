@@ -37,7 +37,7 @@ describe('Input Component', () => {
         const usernameInput = screen.getByTestId('username-input');
 
         // Simulate typing into the input field
-        await userEvent.type(usernameInput, 'john.doe');
+        userEvent.type(usernameInput, 'john.doe');
 
         // Assert that the input's value has been updated
         expect(usernameInput).toHaveValue('john.doe');
