@@ -29,27 +29,23 @@ export const TransactionProvider = ({ children }) => {
   console.log(user);
 
   const addTrans = async (input) => {
-    try {
-      if (!user) {
-        throw new Error("User object is null");
-      }
-      const response = await fetch(`${baseUrl}/transaction/${user.id}/add`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(input),
-      });
-
-      if (!response.ok) {
-        const result = await response.json();
-        alert(`Failed to add transaction: ${result.error}`);
-        return;
-      }
-      alert("Transaction added successfully");
-    } catch (error) {
-      alert("An error occurred: " + error.message);
+    if (!user) {
+      throw new Error("User object is null");
+    }
+    console.log('input: ' + input);
+    const response = await fetch(`${baseUrl}/transaction/${user.id}/add`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(input),
+    });
+    console.log('response' + response);
+    if (!response.ok) {
+      const result = await response.json();
+      alert(`Failed to add transaction: ${result.error}`);
+      return;
     }
   };
 

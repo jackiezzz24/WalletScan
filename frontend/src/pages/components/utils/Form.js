@@ -88,10 +88,13 @@ function Form() {
   };
 
   const handleSubmit = async (e) => {
-    if (expenses) {
-      addTrans(inputState);
-    } else {
-      addTrans(inputState);
+    e.preventDefault();
+    try {
+      await addTrans(inputState);
+      alert("Transaction added successfully");
+    } catch (error) {
+      setError(`Failed to submit form: ${error.message}`);
+      console.error(error);
     }
   };
 
