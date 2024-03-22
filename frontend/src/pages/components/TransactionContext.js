@@ -41,7 +41,7 @@ export const TransactionProvider = ({ children }) => {
         },
         body: JSON.stringify(input),
       });
-
+      
       if (!response.ok) {
         const result = await response.json();
         alert(`Failed to add transaction: ${result.error}`);
