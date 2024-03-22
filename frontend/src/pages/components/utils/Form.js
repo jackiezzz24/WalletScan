@@ -87,9 +87,15 @@ function Form() {
     setError("");
   };
 
-  const handleSubmit = async () => {
-    console.log(inputState);
-    addTrans(inputState);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await addTrans(inputState);
+      alert("Transaction added successfully");
+    } catch (error) {
+      setError(`Failed to submit form: ${error.message}`);
+      console.error(error);
+    }
   };
 
   const readImage = async (cloudinaryUrl) => {
