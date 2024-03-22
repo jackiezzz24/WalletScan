@@ -39,7 +39,7 @@ function Form() {
     userid: "",
     receipt_img: "",
   };
-  
+
   const [inputState, setInputState] = useState(initalState);
 
   const currencies = ["USD", "CAD", "CNY", "EUR", "GBP", "JPY"];
@@ -334,6 +334,9 @@ function Form() {
             <img src={receipt_image} alt="Default Receipt" />
           )}
         </div>
+        <p style={{ textAlign: "center" }}>
+          Using generative AI (OCR API) to read text from uploaded image
+        </p>
         <div className="file-input">
           <input
             type="file"
