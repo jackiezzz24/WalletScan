@@ -28,7 +28,7 @@ function Form() {
     }));
   }, [user]);
 
-  const [inputState, setInputState] = useState({
+  const initalState = {
     merchant: "",
     amount: "",
     currency: "",
@@ -38,7 +38,10 @@ function Form() {
     description: "",
     userid: "",
     receipt_img: "",
-  });
+  };
+  
+  const [inputState, setInputState] = useState(initalState);
+
   const currencies = ["USD", "CAD", "CNY", "EUR", "GBP", "JPY"];
   const expenseCategories = [
     "Education",
@@ -92,6 +95,8 @@ function Form() {
     try {
       await addTrans(inputState);
       alert("Transaction added successfully");
+      setInputState(initalState);
+      setPreviewImage(null);
     } catch (error) {
       setError(`Failed to submit form: ${error.message}`);
       console.error(error);
@@ -115,7 +120,7 @@ function Form() {
       }
       // Parse the JSON response and return the relevant data
       const responseData = await response.json();
-      console.log(responseData); // Add this line
+
       const { merchant, amount, date } = responseData;
       const timeValue = dateStringToTimeValue(date);
       setInputState((prevState) => ({

@@ -32,7 +32,7 @@ export const TransactionProvider = ({ children }) => {
     if (!user) {
       throw new Error("User object is null");
     }
-    console.log('input: ' + input);
+
     const response = await fetch(`${baseUrl}/transaction/${user.id}/add`, {
       method: "POST",
       headers: {
@@ -41,7 +41,7 @@ export const TransactionProvider = ({ children }) => {
       },
       body: JSON.stringify(input),
     });
-    console.log('response' + response);
+
     if (!response.ok) {
       const result = await response.json();
       alert(`Failed to add transaction: ${result.error}`);
