@@ -13,38 +13,24 @@ import { ProfileProvider } from "./components/ProfileContext";
 import CategoryForm from "./components/CategoryForm";
 import AddTransaction from "./components/AddTransaction";
 import History from "./components/History";
+import { TransactionProvider } from "./components/TransactionContext";
 
 function Dashboard() {
   const [active, setActive] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [user, setUser] = useState(null);
-  const authToken = localStorage.getItem("authToken");
-
-  const getUserProfile = async () => {
-    try {
-      const baseUrl = process.env.REACT_APP_API;
-      const response = await fetch(`${baseUrl}/auth/profile`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      const result = await response.json();
-      if (response.ok) {
-        const { username, id } = result;
-        setUser({ ...result, username, id });
-      } else {
-        alert(`${result.error}`);
-      }
-    } catch (error) {
-      alert("An error occurred during fetch: " + error.message);
-    }
-  };
 
   useEffect(() => {
-    getUserProfile();
+    const userObject = JSON.parse(localStorage.getItem("user"));
+    setUser(userObject);
+    const handleStorageChange = () => {
+      const updatedUserObject = JSON.parse(localStorage.getItem("user"));
+      setUser(updatedUserObject);
+    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
   }, []);
 
   const global = useTransactionsContext();
@@ -85,27 +71,29 @@ function Dashboard() {
   };
 
   return (
-    <DashboardStyled className="Dashboard">
-      {orbMemo}
-      <MainLayout>
-        <LeftPanel active={active} setActive={handleSetActive} />
-        <ProfileProvider>
-          <main>
-            <div className="scroll-container">{displayData()}</div>
-          </main>
-          <RightPanel
-            active={active}
-            setActive={handleSetActive}
-            setShowForm={setShowForm}
-          />
-        </ProfileProvider>
-      </MainLayout>
-    </DashboardStyled>
+    <TransactionProvider>
+      <DashboardStyled className="Dashboard">
+        {orbMemo}
+        <MainLayout>
+          <LeftPanel active={active} setActive={handleSetActive} />
+          <ProfileProvider>
+            <main>
+              <div className="scroll-container">{displayData()}</div>
+            </main>
+            <RightPanel
+              active={active}
+              setActive={handleSetActive}
+              setShowForm={setShowForm}
+            />
+          </ProfileProvider>
+        </MainLayout>
+      </DashboardStyled>
+    </TransactionProvider>
   );
 }
 
 const DashboardStyled = styled.div`
-  height: 760px;
+  height: 820px;
   position: relative;
   main {
     flex: 1;

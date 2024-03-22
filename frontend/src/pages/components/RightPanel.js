@@ -7,65 +7,42 @@ import { useProfileContext } from './ProfileContext';
 function RightPanel({ active, setActive, setShowForm }) {
 
   const [user, setUser] = useState(null);
-  const authToken = localStorage.getItem('authToken');
   const { profileImageUrl  } = useProfileContext();
+  const [loading, setLoading] = useState(false);
 
-  const getUserProfile = async () => {
-    try {
-      const baseUrl = process.env.REACT_APP_API;
-      const response = await fetch(`${baseUrl}/auth/profile`, {
-        method: "GET",
-        headers: {
-          "Authorization": `Bearer ${authToken}`,
-          "Content-Type": "application/json",
-        }
-      });
-
-      const result = await response.json();
-      if (response.ok) {
-        const { username } = result;
-        setUser({ ...result, username });
-      } else {
-        alert(`${result.error}`);
-      }
-    } catch (error) {
-      alert("An error occurred during fetch: " + error.message);
+  useEffect(() => {
+    const userObject = JSON.parse(localStorage.getItem("user"));
+    setUser(userObject);
+    if (userObject) {
+      setUser((prevUser) => ({
+        ...prevUser,
+        profile_img: profileImageUrl || prevUser.profile_img,
+      }));
     }
-  };
-
-  useEffect(() => {
-    getUserProfile();
-  },[]);
-
-  useEffect(() => {
-    setUser((prevUser) => ({
-      ...prevUser,
-      profile_img: profileImageUrl,
-    }));
   }, [profileImageUrl]);
 
-
-  const downloadFile = () => {
+  const downloadFile = async() => {
+    setLoading(true);
     const baseUrl = process.env.REACT_APP_API;
-    fetch(`${baseUrl}/UserExcelDownloads`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'text/csv', 
-        },
-    })
-    .then(response => response.blob())
-    .then(blob => {
-        const blobUrl = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = blobUrl;
-        link.download = 'transactions.csv';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(blobUrl);
-    })
-    .catch(error => console.error('Error downloading file:', error));
-};
+    try {
+      const response = await fetch(`${baseUrl}/transaction/export/${user.id}`);
+      const blob = await response.blob();
+
+      // Create a URL for the Excel file data
+      const url = window.URL.createObjectURL(blob);
+      
+      // Create a link element and simulate a click to trigger download
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'transactions.xlsx');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error('Error exporting data:', error);
+    }
+    setLoading(false);
+  };
 
   return (
     <RightPanelStyled>
@@ -99,9 +76,10 @@ function RightPanel({ active, setActive, setShowForm }) {
 
       <button className="report-btn" onClick={() => {
        downloadFile();
-      }}>
+      }} disabled={loading}>
+        
         <i className="fa-solid fa-table-list" style={{ marginRight: "8px" }}></i>
-        Generate Report
+        {loading ? 'Exporting...' : 'Generate Report'}
       </button>
     </RightPanelStyled>
   );
@@ -195,7 +173,7 @@ const RightPanelStyled = styled.nav`
   }
 
   .button {
-    margin-top: 50px;
+    margin-top: 80px;
     background-color: rgba(34, 34, 126, 0.9);
     color: white;
     border: none;
@@ -207,7 +185,7 @@ const RightPanelStyled = styled.nav`
     border-radius: 20px;
   }
   .report-btn {
-    margin-top: 10px;
+    margin-top: 30px;
     background-color: rgba(34, 34, 126, 0.9);
     color: white;
     border: none;

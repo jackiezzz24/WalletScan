@@ -34,6 +34,7 @@ function Navbar() {
   const handleLogout = (event) => {
     event.preventDefault();
     localStorage.removeItem("authToken");
+    localStorage.removeItem("user");
     alert("User Logout");
     navigate("/");
     setIsAuthenticated(false);

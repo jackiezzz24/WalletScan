@@ -5,7 +5,7 @@ import { useTransactionsContext } from "./TransactionContext";
 import TransactionItem from "./utils/TransactionItem";
 
 function CategoryForm() {
-  const { getExpenses, expenses } = useTransactionsContext();
+  const { getExpenses, expenses, deleteTrans } = useTransactionsContext();
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState(null);
   const [availableMonths, setAvailableMonths] = useState([]);
@@ -137,6 +137,7 @@ function CategoryForm() {
               onChange={handleMonthChange}
               value={selectedMonth === null ? -1 : selectedMonth}
               className="select"
+              style={{ fontSize: "16px" }}
             >
               <option value={-1}>All Months</option>
               {availableMonths.map((month, index) => (
@@ -149,10 +150,8 @@ function CategoryForm() {
         </div>
        <div className="amount-con">
           <div className={`category-container ${isExpanded ? 'expanded' : ''}`}>
-            {/* Render your category items here */}
             {renderCategoryItems()}
           </div>
-          {/* Show the expand/collapse icon */}
           {allCategories.length > 4 && (
             <div className="toggle-icon" onClick={toggleExpansion}>
               {isExpanded ? <span>-</span> : <span>+</span>}
@@ -173,7 +172,7 @@ function CategoryForm() {
               } = transaction;
               return (
                 <TransactionItem
-                  key={_id}
+                  key={transaction.id}
                   id={_id}
                   merchant={merchant}
                   description={description}
@@ -182,6 +181,7 @@ function CategoryForm() {
                   expenses={expenses}
                   category={category}
                   indicatorColor={expenses ? "#FF5050" : "#5CB85C"}
+                  deleteItem={() => deleteTrans(transaction.id)}
                 />
               );
             })}

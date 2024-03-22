@@ -8,34 +8,15 @@ function Budget() {
   const { getExpenses, expenses } = useTransactionsContext();
   const [selectedMonth, setSelectedMonth] = useState(null);
   const [availableMonths, setAvailableMonths] = useState([]);
+  const [user, setUser] = useState(null);
   const [budgetAmount, setBudgetAmount] = useState(0);
   const [totalExpenseAmount, setTotalExpenseAmount] = useState(0);
-  const authToken = localStorage.getItem("authToken");
-  const baseUrl = process.env.REACT_APP_API;
-
-  const fetchBudgetAmount = async () => {
-    try {
-      const response = await fetch(`${baseUrl}/auth/profile`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      const result = await response.json();
-      if (response.ok) {
-        setBudgetAmount(parseFloat(result.budget));
-      } else {
-        alert(`${result.error}`);
-      }
-    } catch (error) {
-      alert("An error occurred during fetch: " + error.message);
-    }
-  };
 
   useEffect(() => {
-    fetchBudgetAmount();
+    const userObject = JSON.parse(localStorage.getItem("user"));
+    setUser(userObject);
+    const parsedBudget = parseFloat(userObject.budget);
+    setBudgetAmount(parsedBudget);
   }, []);
 
   useEffect(() => {
@@ -140,6 +121,7 @@ function Budget() {
               onChange={handleMonthChange}
               value={selectedMonth === null ? -1 : selectedMonth}
               className="select"
+              style={{ fontSize: "16px" }}
             >
               {availableMonths.map((month, index) => (
                 <option key={index} value={month}>
@@ -194,7 +176,7 @@ const BudgetStyled = styled.div`
   display: flex;
   overflow: auto;
   flex-direction: column;
- 
+
   .header {
     margin-bottom: 2rem;
     display: flex;
@@ -235,10 +217,11 @@ const BudgetStyled = styled.div`
   .stats-con {
     display: flex;
     gap: 1rem;
+    justify-content: center;
 
     .amount-con {
       display: flex;
-      gap: 1rem;
+      gap: 5rem;
       flex-direction: row;
 
       .spend,
@@ -263,7 +246,7 @@ const BudgetStyled = styled.div`
       .percentage .over-budget {
         color: red;
       }
-      
+
       .percentage .under-budget {
         color: green;
       }

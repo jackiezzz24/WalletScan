@@ -1,27 +1,18 @@
 package com.cs5500.walletscan.service.impl;
 
-import com.alibaba.excel.ExcelWriter;
-import com.alibaba.excel.support.ExcelTypeEnum;
 import com.cs5500.walletscan.Utils.JWTUtils;
 import com.cs5500.walletscan.Utils.ValidationUtils;
 import com.cs5500.walletscan.dto.ResponseDto;
 import com.cs5500.walletscan.dto.UserDto;
-import com.cs5500.walletscan.entity.Transaction;
 import com.cs5500.walletscan.entity.User;
 import com.cs5500.walletscan.repository.UserRepository;
 import com.cs5500.walletscan.service.SubscribeService;
 import com.cs5500.walletscan.service.UserService;
-import jakarta.servlet.ServletOutputStream;
-import jakarta.servlet.http.HttpServletResponse;
-import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
-import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -40,7 +31,7 @@ public class UserServiceImpl implements UserService {
     private ValidationUtils validationUtils;
 
     @Override
-    public ResponseDto signUp(ResponseDto signupRequest){
+    public ResponseDto signUp(ResponseDto signupRequest) {
         ResponseDto response = new ResponseDto();
         try {
             String email = signupRequest.getEmail();
@@ -75,7 +66,7 @@ public class UserServiceImpl implements UserService {
                 response.setStatusCode(200);
                 subscribeService.saveSubscribe(savedUser.getEmail());
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             response.setStatusCode(500);
             response.setError(e.getMessage());
         }
@@ -83,7 +74,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseDto signIn(ResponseDto signinRequest){
+    public ResponseDto signIn(ResponseDto signinRequest) {
         ResponseDto response = new ResponseDto();
 
         try {
@@ -102,9 +93,10 @@ public class UserServiceImpl implements UserService {
             var jwt = jwtUtils.generateToken(user);
             response.setStatusCode(200);
             response.setToken(jwt);
+            response.setUser(user);
             response.setExpirationTime("24Hr");
             response.setMessage("Successfully Signed In");
-        } catch (Exception e){
+        } catch (Exception e) {
             response.setStatusCode(500);
             response.setError(e.getMessage());
         }
@@ -189,11 +181,4 @@ public class UserServiceImpl implements UserService {
         }
         return response;
     }
-
-
-
-
-
-
-
 }

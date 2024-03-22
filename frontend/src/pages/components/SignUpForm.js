@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import styled, { keyframes } from "styled-components";
 import "../components/styles/SignUpForm.css";
 import { useNavigate } from "react-router-dom";
 
 function SignUpForm() {
   const [click, setClick] = useState(true);
-  const handleClick = () => setClick(!click);
+  const handleClick = useCallback(() => setClick(prevClick => !prevClick), []);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -37,7 +37,7 @@ function SignUpForm() {
       const result = await response.json();
       if (response.ok) {
         alert(result.message);
-        setClick(!click);
+        setClick(prevClick => !prevClick); 
       } else {
         handleAuthError(result);
       }
@@ -83,8 +83,9 @@ function SignUpForm() {
       if (response.ok) {
         // Save the token to localStorage
         localStorage.setItem("authToken", result.token);
+        localStorage.setItem("user", JSON.stringify(result.user));
         alert(result.message);
-        navigate("/dashboard");
+        navigate("/loading");
       } else {
         handleAuthError(result);
       }
@@ -100,7 +101,7 @@ function SignUpForm() {
         <ButtonAnimate clicked={click} onClick={handleClick}></ButtonAnimate>
 
         <Form className="signin">
-          <Title>Sign In</Title>
+          <Title data-testid="sign-in">Sign In</Title>
           <Input
             type="username"
             name="username"
@@ -110,7 +111,7 @@ function SignUpForm() {
             onChange={(event) => {
               setUsernameLogin(event.target.value);
             }}
-          />
+            data-testid="username-input" />
           <Input
             type="password"
             name="password"
@@ -214,7 +215,7 @@ const BackgroundBox = styled.div`
   .text1 {
     z-index: ${(props) => (props.clicked ? "-700" : "700")};
     transform: ${(props) =>
-      props.clicked ? "translateX(0)" : "translateX(100%)"};
+    props.clicked ? "translateX(0)" : "translateX(100%)"};
     transition: transform 1s ease-in-out;
     animation: ${(props) => (props.clicked ? move : "none")} 1.5s;
   }
@@ -224,7 +225,7 @@ const BackgroundBox = styled.div`
     animation: ${(props) => (props.clicked ? "none" : move)} 1.5s;
 
     transform: ${(props) =>
-      props.clicked ? "translateX(-100%)" : "translateX(0%)"};
+    props.clicked ? "translateX(-100%)" : "translateX(0%)"};
     transition: transform 1s ease-in-out;
   }
 
@@ -242,7 +243,7 @@ const BackgroundBox = styled.div`
     text-align: center;
     z-index: ${(props) => (props.clicked ? "500" : "-500")};
     transform: ${(props) =>
-      props.clicked ? "translateX(50%)" : "translateX(-50%)"};
+    props.clicked ? "translateX(50%)" : "translateX(-50%)"};
     transition: all 1s;
   }
 `;

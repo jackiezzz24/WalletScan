@@ -1,7 +1,5 @@
 package com.cs5500.walletscan.service.impl;
 
-import com.cs5500.walletscan.Utils.ExcelUtils;
-import com.cs5500.walletscan.controller.TransactionController;
 import com.cs5500.walletscan.dto.ResponseDto;
 import com.cs5500.walletscan.dto.TransactionsDto;
 import com.cs5500.walletscan.entity.Transaction;
@@ -9,8 +7,6 @@ import com.cs5500.walletscan.repository.TransactionRepository;
 import com.cs5500.walletscan.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,15 +35,10 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public ResponseDto delete(Long id) {
         ResponseDto response = new ResponseDto();
-            try {
-                // Assuming you have a method to find a transaction by ID
-                Optional<Transaction> transaction = transactionRepository.findById(id);
-                // Check if the transaction exists and belongs to the specified user
-                if (transaction.isPresent()) {
-                    // Delete the transaction
-                    transactionRepository.delete(transaction.get());
-                }
-                response.setMessage("Transaction deleted Successfully");
+        try {
+            Optional<Transaction> transaction = transactionRepository.findById(id);
+            transaction.ifPresent(value -> transactionRepository.delete(value));
+            response.setMessage("Transaction deleted Successfully");
             response.setStatusCode(200);
         } catch (Exception e) {
             response.setStatusCode(500);
@@ -64,14 +55,6 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public List<Transaction> getExpense(Long userId) {
         return transactionRepository.getExpenseByUseridAndExpensesIsTrue(userId);
-    }
-
-    @Override
-    public List<File> zipExcelFileFromDatabase() throws Exception {
-        List<Transaction> customers = transactionRepository.findAll();
-        String fileName = "Customer_Export" + ".xlsx";
-        List<File> resultFiles = ExcelUtils.getFilesExcelStoreDataFromDatabase(customers, fileName);
-        return resultFiles;
     }
 
     private Transaction mapDtoToEntity(TransactionsDto transactionsDto, Long userId) {

@@ -13,20 +13,35 @@ function Form() {
   const [receiptImage, setReceiptImage] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
   const fileInputRef = useRef(null);
+  const [loading, setLoading] = useState(true);
 
-  const authToken = localStorage.getItem("authToken");
+  useEffect(() => {
+    const userObject = JSON.parse(localStorage.getItem("user"));
+    setUser(userObject);
+    setLoading(false);
+  }, []);
 
-  const [inputState, setInputState] = useState({
+  useEffect(() => {
+    setInputState((prevState) => ({
+      ...prevState,
+      currency: user?.currency || "",
+    }));
+  }, [user]);
+
+  const initalState = {
     merchant: "",
     amount: "",
     currency: "",
     expenses: true,
-    date: "",
+    date: new Date(),
     category: "",
     description: "",
     userid: "",
     receipt_img: "",
-  });
+  };
+
+  const [inputState, setInputState] = useState(initalState);
+
   const currencies = ["USD", "CAD", "CNY", "EUR", "GBP", "JPY"];
   const expenseCategories = [
     "Education",
@@ -49,33 +64,6 @@ function Form() {
     "Other",
   ];
 
-  const getUserProfile = async () => {
-    try {
-      const baseUrl = process.env.REACT_APP_API;
-      const response = await fetch(`${baseUrl}/auth/profile`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      const result = await response.json();
-      if (response.ok) {
-        const { username, id } = result;
-        setUser({ ...result, username, id });
-      } else {
-        alert(`${result.error}`);
-      }
-    } catch (error) {
-      alert("An error occurred during fetch: " + error.message);
-    }
-  };
-
-  useEffect(() => {
-    getUserProfile();
-  }, []);
-
   const { merchant, amount, currency, expenses, date, category, description } =
     inputState;
 
@@ -83,21 +71,35 @@ function Form() {
     const value = e.target.value;
 
     setInputState((prevState) => {
-      if (name === "expenses") {
-        return { ...prevState, [name]: value === "true" };
-      } else {
-        return { ...prevState, [name]: value };
+      let updatedState = {
+        ...prevState,
+        [name]: name === "expenses" ? value === true : value,
+      };
+
+      // Update description if merchant or category is changed
+      if (name === "merchant" || name === "category") {
+        updatedState = {
+          ...updatedState,
+          description: `${updatedState.merchant} ${updatedState.category}`,
+        };
       }
+
+      return updatedState;
     });
 
     setError("");
   };
 
   const handleSubmit = async (e) => {
-    if (expenses) {
-      addTrans(inputState);
-    } else {
-      addTrans(inputState);
+    e.preventDefault();
+    try {
+      await addTrans(inputState);
+      alert("Transaction added successfully");
+      setInputState(initalState);
+      setPreviewImage(null);
+    } catch (error) {
+      setError(`Failed to submit form: ${error.message}`);
+      console.error(error);
     }
   };
 
@@ -118,10 +120,10 @@ function Form() {
       }
       // Parse the JSON response and return the relevant data
       const responseData = await response.json();
-      console.log(responseData); // Add this line
+
       const { merchant, amount, date } = responseData;
       const timeValue = dateStringToTimeValue(date);
-      setInputState(prevState => ({
+      setInputState((prevState) => ({
         ...prevState,
         merchant: merchant,
         amount: amount,
@@ -146,11 +148,11 @@ function Form() {
     if (!file) {
       throw new Error("No image selected for upload.");
     }
-  
+
     const formData = new FormData();
     formData.append("file", file);
     formData.append("upload_preset", "ml_default");
-  
+
     try {
       const cloudinaryResponse = await fetch(
         `https://api.cloudinary.com/v1_1/dxhu2wrmc/image/upload`,
@@ -159,21 +161,22 @@ function Form() {
           body: formData,
         }
       );
-  
+
       if (!cloudinaryResponse.ok) {
         const cloudinaryResult = await cloudinaryResponse.json();
-        throw new Error(`Cloudinary upload error: ${cloudinaryResult.error?.message}`);
+        throw new Error(
+          `Cloudinary upload error: ${cloudinaryResult.error?.message}`
+        );
       }
-  
+
       const cloudinaryResult = await cloudinaryResponse.json();
       return cloudinaryResult.secure_url;
     } catch (error) {
       throw new Error(`Error uploading image to Cloudinary: ${error.message}`);
     }
   };
-  
-  const handleFileChange = async (e) => {
 
+  const handleFileChange = async (e) => {
     if (!user) {
       console.error("User object is not available");
       return;
@@ -184,7 +187,7 @@ function Form() {
       setPreviewImage(null);
       return;
     }
-  
+
     // Generate a preview of the selected file
     const reader = new FileReader();
     reader.onloadend = () => {
@@ -198,7 +201,7 @@ function Form() {
       if (!cloudinaryUrl) {
         throw new Error("Failed to upload image to Cloudinary.");
       }
-  
+
       // Process the image with OCR and update the form state
       await readImage(cloudinaryUrl);
     } catch (error) {
@@ -215,7 +218,7 @@ function Form() {
     <FormStyled onSubmit={handleSubmit}>
       <div className="inputItem">
         <div className="input-control">
-        <input
+          <input
             value={merchant}
             type="text"
             name={"merchant"}
@@ -331,6 +334,9 @@ function Form() {
             <img src={receipt_image} alt="Default Receipt" />
           )}
         </div>
+        <p style={{ textAlign: "center" }}>
+          Using generative AI (OCR API) to read text from uploaded image
+        </p>
         <div className="file-input">
           <input
             type="file"
