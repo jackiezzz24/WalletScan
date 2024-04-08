@@ -23,7 +23,7 @@ public class OCRClient {
     private static String API_URL = "https://vision.googleapis.com/v1/images:annotate?key=";
     private static String API_KEY = "AIzaSyDKaDElGw_F39jpvr5ngP2dZ476CDO1ktc";
     
-    private String buildURL() {
+    public String buildURL() {
         return API_URL + API_KEY;
     }
     
@@ -64,7 +64,7 @@ public class OCRClient {
         }
     }
     
-    private String createJsonRequestBody(String url) {
+    public String createJsonRequestBody(String url) {
         // Create the JSON Object for the request body
         JsonObject jsonRequest = Json.createObjectBuilder()
             .add("requests", Json.createArrayBuilder()

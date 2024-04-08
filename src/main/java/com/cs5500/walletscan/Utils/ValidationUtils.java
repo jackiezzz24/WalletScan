@@ -19,7 +19,7 @@ public class ValidationUtils {
     public boolean isValidPassword(String password) {
         Pattern pattern = Pattern.compile(PASSWORD_REGEX);
         Matcher matcher = pattern.matcher(password);
-        return !matcher.matches();
+        return matcher.matches();
     }
 
 
