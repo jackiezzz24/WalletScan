@@ -45,7 +45,7 @@ public class UserServiceImpl implements UserService {
             }
 
             // Add password length validation
-            if (validationUtils.isValidPassword(password)) {
+            if (!validationUtils.isValidPassword(password)) {
                 response.setStatusCode(400);
                 response.setError("Password must be more than 6 characters");
                 return response;
@@ -82,7 +82,7 @@ public class UserServiceImpl implements UserService {
             String username = signinRequest.getUsername();
 
             // Add password length validation
-            if (validationUtils.isValidPassword(password)) {
+            if (!validationUtils.isValidPassword(password)) {
                 response.setStatusCode(400);
                 response.setError("Password must be more than 6 characters");
                 return response;

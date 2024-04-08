@@ -19,7 +19,7 @@ import java.util.List;
 public class OCRServlet extends HttpServlet {
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         // Ensure the content type is application/json
         if (!req.getContentType().equalsIgnoreCase("application/json")) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid content type. Application/json required.");
