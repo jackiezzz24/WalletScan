@@ -1,0 +1,182 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > SecurityConfig</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.cs5500.walletscan.config</a>
+</div>
+
+<h1>Coverage Summary for Class: SecurityConfig (com.cs5500.walletscan.config)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SecurityConfig</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (16/16)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SecurityConfig$$SpringCGLIB$$0</td>
+  </tr>
+  <tr>
+    <td class="name">SecurityConfig$$SpringCGLIB$$FastClass$$0</td>
+  </tr>
+  <tr>
+    <td class="name">SecurityConfig$$SpringCGLIB$$FastClass$$1</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (16/16)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.cs5500.walletscan.config;
+&nbsp;
+&nbsp;import com.cs5500.walletscan.service.impl.UserDetailsServiceImpl;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;import org.springframework.security.authentication.AuthenticationManager;
+&nbsp;import org.springframework.security.authentication.AuthenticationProvider;
+&nbsp;import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+&nbsp;import org.springframework.security.config.Customizer;
+&nbsp;import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+&nbsp;import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+&nbsp;import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+&nbsp;import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+&nbsp;import org.springframework.security.config.http.SessionCreationPolicy;
+&nbsp;import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+&nbsp;import org.springframework.security.crypto.password.PasswordEncoder;
+&nbsp;import org.springframework.security.web.SecurityFilterChain;
+&nbsp;import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+&nbsp;
+&nbsp;@Configuration
+&nbsp;@EnableWebSecurity
+<b class="fc">&nbsp;public class SecurityConfig {</b>
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    private UserDetailsServiceImpl userDetailsServiceImpl;
+&nbsp;    @Autowired
+&nbsp;    private JWTAuthFilter jwtAuthFilter;
+&nbsp;
+&nbsp;    @Bean
+&nbsp;    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+<b class="fc">&nbsp;        httpSecurity.csrf(AbstractHttpConfigurer::disable)</b>
+<b class="fc">&nbsp;                .cors(Customizer.withDefaults())</b>
+<b class="fc">&nbsp;                .authorizeHttpRequests(request -&gt; request.requestMatchers(&quot;/api/**&quot;, &quot;/ocr/**&quot;).permitAll()</b>
+<b class="fc">&nbsp;                        .requestMatchers(&quot;/api/auth/profile&quot;).authenticated()</b>
+<b class="fc">&nbsp;                        .anyRequest().authenticated())</b>
+<b class="fc">&nbsp;                .sessionManagement(manager -&gt; manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))</b>
+<b class="fc">&nbsp;                .authenticationProvider(authenticationProvider()).addFilterBefore(</b>
+<b class="fc">&nbsp;                        jwtAuthFilter, UsernamePasswordAuthenticationFilter.class</b>
+&nbsp;                );
+<b class="fc">&nbsp;        return httpSecurity.build();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Bean
+&nbsp;    public AuthenticationProvider authenticationProvider() {
+<b class="fc">&nbsp;        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();</b>
+<b class="fc">&nbsp;        daoAuthenticationProvider.setUserDetailsService(userDetailsServiceImpl);</b>
+<b class="fc">&nbsp;        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());</b>
+<b class="fc">&nbsp;        return daoAuthenticationProvider;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Bean
+&nbsp;    public PasswordEncoder passwordEncoder() {
+<b class="fc">&nbsp;        return new BCryptPasswordEncoder();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Bean
+&nbsp;    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+&nbsp;            throws Exception {
+<b class="fc">&nbsp;        return authenticationConfiguration.getAuthenticationManager();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-08 22:02</div>
+</div>
+</body>
+</html>
