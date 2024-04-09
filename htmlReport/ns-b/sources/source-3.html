@@ -1,0 +1,112 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > TransactionRepository</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.cs5500.walletscan.repository</a>
+</div>
+
+<h1>Coverage Summary for Class: TransactionRepository (com.cs5500.walletscan.repository)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+</tr>
+  <tr>
+    <td class="name">TransactionRepository$MockitoMock$9E4RQ8sN</td>
+  </tr>
+  <tr>
+    <td class="name">TransactionRepository$MockitoMock$9E4RQ8sN$auxiliary$hGn6PV43</td>
+  </tr>
+  <tr>
+    <td class="name">TransactionRepository$MockitoMock$9E4RQ8sN$auxiliary$XqzyKITH</td>
+  </tr>
+  <tr>
+    <td class="name">TransactionRepository$MockitoMock$Qo7JK1Ck</td>
+  </tr>
+  <tr>
+    <td class="name">TransactionRepository$MockitoMock$Qo7JK1Ck$auxiliary$m3OWoZU7</td>
+  </tr>
+  <tr>
+    <td class="name">TransactionRepository$MockitoMock$Qo7JK1Ck$auxiliary$uJXJj3yX</td>
+  </tr>
+  <tr>
+    <td class="name">TransactionRepository$MockitoMock$x4XkH8qq</td>
+  </tr>
+  <tr>
+    <td class="name">TransactionRepository$MockitoMock$x4XkH8qq$auxiliary$34HYgicc</td>
+  </tr>
+  <tr>
+    <td class="name">TransactionRepository$MockitoMock$x4XkH8qq$auxiliary$tamOhzEA</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.cs5500.walletscan.repository;
+&nbsp;
+&nbsp;import com.cs5500.walletscan.entity.Transaction;
+&nbsp;import org.springframework.data.jpa.repository.JpaRepository;
+&nbsp;import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+&nbsp;import org.springframework.stereotype.Repository;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;@EnableJpaRepositories
+&nbsp;@Repository
+&nbsp;public interface TransactionRepository extends JpaRepository&lt;Transaction, Long&gt; {
+&nbsp;    List&lt;Transaction&gt; getIncomeByUseridAndExpensesIsFalse (Long userId);
+&nbsp;    List&lt;Transaction&gt; getExpenseByUseridAndExpensesIsTrue (Long userId);
+&nbsp;    List&lt;Transaction&gt; findAllByUserid(Long userId);
+&nbsp;
+&nbsp;}
+&nbsp;
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-08 22:02</div>
+</div>
+</body>
+</html>

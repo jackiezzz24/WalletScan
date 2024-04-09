@@ -1,0 +1,177 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > TransactionServiceImpl</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.cs5500.walletscan.service.impl</a>
+</div>
+
+<h1>Coverage Summary for Class: TransactionServiceImpl (com.cs5500.walletscan.service.impl)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TransactionServiceImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.9%
+  </span>
+  <span class="absValue">
+    (29/33)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.cs5500.walletscan.service.impl;
+&nbsp;
+&nbsp;import com.cs5500.walletscan.dto.ResponseDto;
+&nbsp;import com.cs5500.walletscan.dto.TransactionsDto;
+&nbsp;import com.cs5500.walletscan.entity.Transaction;
+&nbsp;import com.cs5500.walletscan.repository.TransactionRepository;
+&nbsp;import com.cs5500.walletscan.service.TransactionService;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;@Service
+<b class="fc">&nbsp;public class TransactionServiceImpl implements TransactionService {</b>
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    private TransactionRepository transactionRepository;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ResponseDto add(Long userId, TransactionsDto transactionsDto) {
+<b class="fc">&nbsp;        ResponseDto response = new ResponseDto();</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            Transaction transaction = mapDtoToEntity(transactionsDto, userId);</b>
+<b class="fc">&nbsp;            Transaction savedTrans = transactionRepository.save(transaction);</b>
+<b class="fc">&nbsp;            response.setTransaction(savedTrans);</b>
+<b class="fc">&nbsp;            response.setMessage(&quot;Transaction Saved Successfully&quot;);</b>
+<b class="fc">&nbsp;            response.setStatusCode(200);</b>
+<b class="fc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            response.setStatusCode(500);</b>
+<b class="nc">&nbsp;            response.setError(e.getMessage());</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return response;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ResponseDto delete(Long id) {
+<b class="fc">&nbsp;        ResponseDto response = new ResponseDto();</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            Optional&lt;Transaction&gt; transaction = transactionRepository.findById(id);</b>
+<b class="fc">&nbsp;            transaction.ifPresent(value -&gt; transactionRepository.delete(value));</b>
+<b class="fc">&nbsp;            response.setMessage(&quot;Transaction deleted Successfully&quot;);</b>
+<b class="fc">&nbsp;            response.setStatusCode(200);</b>
+<b class="fc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            response.setStatusCode(500);</b>
+<b class="nc">&nbsp;            response.setError(e.getMessage());</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return response;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;Transaction&gt; getIncome(Long userId) {
+<b class="fc">&nbsp;        return transactionRepository.getIncomeByUseridAndExpensesIsFalse(userId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;Transaction&gt; getExpense(Long userId) {
+<b class="fc">&nbsp;        return transactionRepository.getExpenseByUseridAndExpensesIsTrue(userId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Transaction mapDtoToEntity(TransactionsDto transactionsDto, Long userId) {
+<b class="fc">&nbsp;        Transaction transaction = new Transaction();</b>
+<b class="fc">&nbsp;        transaction.setAmount(transactionsDto.getAmount());</b>
+<b class="fc">&nbsp;        transaction.setDate(transactionsDto.getDate());</b>
+<b class="fc">&nbsp;        transaction.setCategory(transactionsDto.getCategory());</b>
+<b class="fc">&nbsp;        transaction.setExpenses(transactionsDto.getExpenses());</b>
+<b class="fc">&nbsp;        transaction.setCurrency(transactionsDto.getCurrency());</b>
+<b class="fc">&nbsp;        transaction.setDescription(transactionsDto.getDescription());</b>
+<b class="fc">&nbsp;        transaction.setMerchant(transactionsDto.getMerchant());</b>
+<b class="fc">&nbsp;        transaction.setUserid(userId);</b>
+<b class="fc">&nbsp;        transaction.setReceipt_img(transactionsDto.getReceipt_img());</b>
+<b class="fc">&nbsp;        return transaction;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-08 22:02</div>
+</div>
+</body>
+</html>

@@ -111,7 +111,7 @@ function SignUpForm() {
             onChange={(event) => {
               setUsernameLogin(event.target.value);
             }}
-            data-testid="username-input" />
+            data-testid="username-input-signin" />
           <Input
             type="password"
             name="password"
@@ -121,15 +121,16 @@ function SignUpForm() {
             onChange={(event) => {
               setPasswordLogin(event.target.value);
             }}
+            data-testid="password-input-signin"
           />
           <Link href="#" onClick={handleClick}>
             Don't have an account?
           </Link>
-          <Button onClick={onSignInTapped}>Sign In</Button>
+          <Button data-testid="signin-btn" onClick={onSignInTapped}>Sign In</Button>
         </Form>
 
         <Form className="signup">
-          <Title>Sign Up</Title>
+          <Title data-testid="sign-up">Sign Up</Title>
           <Input
             type="text"
             name="username"
@@ -139,6 +140,7 @@ function SignUpForm() {
             onChange={(event) => {
               setUsername(event.target.value);
             }}
+            data-testid="username-input-signup"
           />
 
           <Input
@@ -150,6 +152,7 @@ function SignUpForm() {
             onChange={(event) => {
               setEmail(event.target.value);
             }}
+            data-testid="email-input-signup"
           />
           <Input
             type="password"
@@ -160,11 +163,12 @@ function SignUpForm() {
             onChange={(event) => {
               setPassword(event.target.value);
             }}
+            data-testid="password-input-signup"
           />
           <Link href="#" onClick={handleClick}>
             Already have an Account?
           </Link>
-          <Button onClick={onSignUpTapped}>Sign Up</Button>
+          <Button  data-testid="signup-btn" onClick={onSignUpTapped}>Sign Up</Button>
         </Form>
 
         <Text className="text1" clicked={click}>

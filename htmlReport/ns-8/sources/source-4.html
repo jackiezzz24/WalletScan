@@ -1,0 +1,288 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > UserServiceImpl</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.cs5500.walletscan.service.impl</a>
+</div>
+
+<h1>Coverage Summary for Class: UserServiceImpl (com.cs5500.walletscan.service.impl)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UserServiceImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80.2%
+  </span>
+  <span class="absValue">
+    (85/106)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.cs5500.walletscan.service.impl;
+&nbsp;
+&nbsp;import com.cs5500.walletscan.Utils.JWTUtils;
+&nbsp;import com.cs5500.walletscan.Utils.ValidationUtils;
+&nbsp;import com.cs5500.walletscan.dto.ResponseDto;
+&nbsp;import com.cs5500.walletscan.dto.UserDto;
+&nbsp;import com.cs5500.walletscan.entity.User;
+&nbsp;import com.cs5500.walletscan.repository.UserRepository;
+&nbsp;import com.cs5500.walletscan.service.SubscribeService;
+&nbsp;import com.cs5500.walletscan.service.UserService;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+&nbsp;import org.springframework.security.crypto.password.PasswordEncoder;
+&nbsp;import org.springframework.security.authentication.AuthenticationManager;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;
+&nbsp;@Service
+<b class="fc">&nbsp;public class UserServiceImpl implements UserService {</b>
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    private UserRepository userRepository;
+&nbsp;    @Autowired
+&nbsp;    private PasswordEncoder passwordEncoder;
+&nbsp;    @Autowired
+&nbsp;    private JWTUtils jwtUtils;
+&nbsp;    @Autowired
+&nbsp;    private AuthenticationManager authenticationManager;
+&nbsp;    @Autowired
+&nbsp;    private SubscribeService subscribeService;
+&nbsp;    @Autowired
+&nbsp;    private ValidationUtils validationUtils;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ResponseDto signUp(ResponseDto signupRequest) {
+<b class="fc">&nbsp;        ResponseDto response = new ResponseDto();</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            String email = signupRequest.getEmail();</b>
+<b class="fc">&nbsp;            String password = signupRequest.getPassword();</b>
+&nbsp;
+&nbsp;            // Add email validation
+<b class="fc">&nbsp;            if (!validationUtils.isValidEmail(email)) {</b>
+<b class="fc">&nbsp;                response.setStatusCode(400);</b>
+<b class="fc">&nbsp;                response.setError(&quot;Invalid email format&quot;);</b>
+<b class="fc">&nbsp;                return response;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // Add password length validation
+<b class="fc">&nbsp;            if (!validationUtils.isValidPassword(password)) {</b>
+<b class="nc">&nbsp;                response.setStatusCode(400);</b>
+<b class="nc">&nbsp;                response.setError(&quot;Password must be more than 6 characters&quot;);</b>
+<b class="nc">&nbsp;                return response;</b>
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            User user = new User();</b>
+<b class="fc">&nbsp;            user.setUsername(signupRequest.getUsername());</b>
+<b class="fc">&nbsp;            user.setEmail(email);</b>
+<b class="fc">&nbsp;            user.setPassword(passwordEncoder.encode(password));</b>
+<b class="fc">&nbsp;            user.setBudget(&quot;1000&quot;);</b>
+<b class="fc">&nbsp;            user.setCurrency(&quot;USD&quot;);</b>
+<b class="fc">&nbsp;            user.setNotification(true);</b>
+<b class="fc">&nbsp;            user.setSubscribe(true);</b>
+<b class="fc">&nbsp;            User savedUser = userRepository.save(user);</b>
+<b class="fc">&nbsp;            if (savedUser.getId() &gt; 0) {</b>
+<b class="fc">&nbsp;                response.setUser(savedUser);</b>
+<b class="fc">&nbsp;                response.setMessage(&quot;User Sign-Up Successfully. Please Sign-In.&quot;);</b>
+<b class="fc">&nbsp;                response.setStatusCode(200);</b>
+<b class="fc">&nbsp;                subscribeService.saveSubscribe(savedUser.getEmail());</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            response.setStatusCode(500);</b>
+<b class="nc">&nbsp;            response.setError(e.getMessage());</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return response;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ResponseDto signIn(ResponseDto signinRequest) {
+<b class="fc">&nbsp;        ResponseDto response = new ResponseDto();</b>
+&nbsp;
+&nbsp;        try {
+<b class="fc">&nbsp;            String password = signinRequest.getPassword();</b>
+<b class="fc">&nbsp;            String username = signinRequest.getUsername();</b>
+&nbsp;
+&nbsp;            // Add password length validation
+<b class="fc">&nbsp;            if (!validationUtils.isValidPassword(password)) {</b>
+<b class="fc">&nbsp;                response.setStatusCode(400);</b>
+<b class="fc">&nbsp;                response.setError(&quot;Password must be more than 6 characters&quot;);</b>
+<b class="fc">&nbsp;                return response;</b>
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));</b>
+<b class="fc">&nbsp;            var user = userRepository.findByUsername(username).orElseThrow();</b>
+<b class="fc">&nbsp;            var jwt = jwtUtils.generateToken(user);</b>
+<b class="fc">&nbsp;            response.setStatusCode(200);</b>
+<b class="fc">&nbsp;            response.setToken(jwt);</b>
+<b class="fc">&nbsp;            response.setUser(user);</b>
+<b class="fc">&nbsp;            response.setExpirationTime(&quot;24Hr&quot;);</b>
+<b class="fc">&nbsp;            response.setMessage(&quot;Successfully Signed In&quot;);</b>
+<b class="fc">&nbsp;        } catch (Exception e) {</b>
+<b class="fc">&nbsp;            response.setStatusCode(500);</b>
+<b class="fc">&nbsp;            response.setError(e.getMessage());</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return response;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ResponseDto updateUserSettings(Long userId, UserDto userDto) {
+<b class="fc">&nbsp;        ResponseDto response = new ResponseDto();</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            User existingUser = userRepository.findById(userId).orElse(null);</b>
+&nbsp;
+<b class="fc">&nbsp;            if (existingUser != null) {</b>
+<b class="fc">&nbsp;                existingUser.setBudget(userDto.getBudget());</b>
+<b class="fc">&nbsp;                existingUser.setCurrency(userDto.getCurrency());</b>
+<b class="fc">&nbsp;                existingUser.setSubscribe(userDto.getSubscribe());</b>
+<b class="fc">&nbsp;                existingUser.setNotification(userDto.getNotification());</b>
+&nbsp;
+<b class="fc">&nbsp;                User savedUser = userRepository.save(existingUser);</b>
+<b class="fc">&nbsp;                response.setUser(savedUser);</b>
+<b class="fc">&nbsp;                response.setMessage(&quot;User Updated Successfully&quot;);</b>
+<b class="fc">&nbsp;                response.setStatusCode(200);</b>
+<b class="fc">&nbsp;            } else {</b>
+<b class="nc">&nbsp;                response.setStatusCode(404);</b>
+<b class="nc">&nbsp;                response.setError(&quot;User Not Found&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            response.setStatusCode(500);</b>
+<b class="nc">&nbsp;            response.setError(e.getMessage());</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return response;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ResponseDto updateUserPassword(Long userId, String oldPassword, String newPassword) {
+<b class="fc">&nbsp;        ResponseDto response = new ResponseDto();</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            User existingUser = userRepository.findById(userId).orElse(null);</b>
+&nbsp;
+<b class="fc">&nbsp;            if (existingUser != null) {</b>
+<b class="fc">&nbsp;                if (passwordEncoder.matches(oldPassword, existingUser.getPassword())) {</b>
+<b class="fc">&nbsp;                    existingUser.setPassword(passwordEncoder.encode(newPassword));</b>
+<b class="fc">&nbsp;                    User savedUser = userRepository.save(existingUser);</b>
+<b class="fc">&nbsp;                    response.setUser(savedUser);</b>
+<b class="fc">&nbsp;                    response.setMessage(&quot;Password Updated Successfully&quot;);</b>
+<b class="fc">&nbsp;                    response.setStatusCode(200);</b>
+<b class="fc">&nbsp;                } else {</b>
+<b class="nc">&nbsp;                    response.setStatusCode(400);</b>
+<b class="nc">&nbsp;                    response.setError(&quot;Wrong Password. Please try again&quot;);</b>
+&nbsp;                }
+<b class="nc">&nbsp;            } else {</b>
+<b class="nc">&nbsp;                response.setStatusCode(404);</b>
+<b class="nc">&nbsp;                response.setError(&quot;User Not Found&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            response.setStatusCode(500);</b>
+<b class="nc">&nbsp;            response.setError(e.getMessage());</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return response;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ResponseDto updateProfileImage(Long userId, UserDto userDto) {
+<b class="fc">&nbsp;        ResponseDto response = new ResponseDto();</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            User existingUser = userRepository.findById(userId).orElse(null);</b>
+&nbsp;
+<b class="fc">&nbsp;            if (existingUser != null) {</b>
+<b class="fc">&nbsp;                existingUser.setProfile_img(userDto.getProfile_img());</b>
+&nbsp;
+<b class="fc">&nbsp;                User savedUser = userRepository.save(existingUser);</b>
+<b class="fc">&nbsp;                response.setUser(savedUser);</b>
+<b class="fc">&nbsp;                response.setMessage(&quot;Profile Image Upload Successfully&quot;);</b>
+<b class="fc">&nbsp;                response.setStatusCode(200);</b>
+<b class="fc">&nbsp;            } else {</b>
+<b class="nc">&nbsp;                response.setStatusCode(404);</b>
+<b class="nc">&nbsp;                response.setError(&quot;User Not Found&quot;);</b>
+&nbsp;            }
+<b class="fc">&nbsp;        } catch (Exception e) {</b>
+<b class="fc">&nbsp;            response.setStatusCode(500);</b>
+<b class="fc">&nbsp;            response.setError(e.getMessage());</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return response;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-08 22:02</div>
+</div>
+</body>
+</html>

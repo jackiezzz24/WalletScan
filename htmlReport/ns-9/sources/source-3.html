@@ -1,0 +1,169 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > OCRServlet</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.cs5500.walletscan.servlet</a>
+</div>
+
+<h1>Coverage Summary for Class: OCRServlet (com.cs5500.walletscan.servlet)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OCRServlet</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    84.6%
+  </span>
+  <span class="absValue">
+    (22/26)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.cs5500.walletscan.servlet;
+&nbsp;
+&nbsp;import com.cs5500.walletscan.Utils.WallestScanUtils;
+&nbsp;import com.cs5500.walletscan.entity.Receipt;
+&nbsp;import com.cs5500.walletscan.model.Text;
+&nbsp;import jakarta.servlet.ServletException;
+&nbsp;import jakarta.servlet.annotation.WebServlet;
+&nbsp;import jakarta.servlet.http.HttpServlet;
+&nbsp;import jakarta.servlet.http.HttpServletRequest;
+&nbsp;import jakarta.servlet.http.HttpServletResponse;
+&nbsp;import org.cloudinary.json.JSONObject;
+&nbsp;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.PrintWriter;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;@WebServlet(name = &quot;OCRServlet&quot;, urlPatterns = { &quot;/api/ocr&quot; })
+<b class="fc">&nbsp;public class OCRServlet extends HttpServlet {</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+&nbsp;        // Ensure the content type is application/json
+<b class="fc">&nbsp;        if (!req.getContentType().equalsIgnoreCase(&quot;application/json&quot;)) {</b>
+<b class="nc">&nbsp;            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, &quot;Invalid content type. Application/json required.&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        // Read JSON from the request body
+<b class="fc">&nbsp;        StringBuilder jsonBuffer = new StringBuilder();</b>
+&nbsp;        String line;
+<b class="fc">&nbsp;        try (BufferedReader reader = req.getReader()) {</b>
+<b class="fc">&nbsp;            while ((line = reader.readLine()) != null) {</b>
+<b class="fc">&nbsp;                jsonBuffer.append(line);</b>
+&nbsp;            }
+<b class="fc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, &quot;Error reading JSON request body.&quot;);</b>
+&nbsp;            return;
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="fc">&nbsp;        String json = jsonBuffer.toString();</b>
+<b class="fc">&nbsp;        JSONObject jsonObject = new JSONObject(json);</b>
+<b class="fc">&nbsp;        String url = jsonObject.getString(&quot;url&quot;); // Directly get the string value for &quot;url&quot;</b>
+&nbsp;
+<b class="fc">&nbsp;        if (url == null || url.isEmpty()) {</b>
+<b class="nc">&nbsp;            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, &quot;URL parameter is missing in JSON body.&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        OCRClient client = new OCRClient();</b>
+&nbsp;        List&lt;Text&gt; texts;
+<b class="fc">&nbsp;        texts = client.getText(client.performOCR(url));</b>
+<b class="fc">&nbsp;        Receipt receipt = WallestScanUtils.readTextToReceipt(texts);</b>
+<b class="fc">&nbsp;        JSONObject res = new JSONObject();</b>
+<b class="fc">&nbsp;        res.put(&quot;merchant&quot;, receipt.getStoreName());</b>
+<b class="fc">&nbsp;        res.put(&quot;amount&quot;, receipt.getTotal() + &quot;&quot;);</b>
+<b class="fc">&nbsp;        res.put(&quot;date&quot;, receipt.getDate());</b>
+&nbsp;
+&nbsp;        // Set content type
+<b class="fc">&nbsp;        resp.setContentType(&quot;application/json&quot;);</b>
+<b class="fc">&nbsp;        PrintWriter out = resp.getWriter();</b>
+<b class="fc">&nbsp;        out.println(res.toString());</b>
+<b class="fc">&nbsp;        out.close();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-08 22:02</div>
+</div>
+</body>
+</html>

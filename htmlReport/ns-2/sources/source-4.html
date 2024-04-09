@@ -1,0 +1,149 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1252"> 
+  <title>Coverage Report > WallestScanUtils</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.cs5500.walletscan.Utils</a>
+</div>
+
+<h1>Coverage Summary for Class: WallestScanUtils (com.cs5500.walletscan.Utils)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WallestScanUtils</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    92.9%
+  </span>
+  <span class="absValue">
+    (13/14)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.cs5500.walletscan.Utils;
+&nbsp;
+&nbsp;import com.cs5500.walletscan.entity.Receipt;
+&nbsp;import com.cs5500.walletscan.model.Text;
+&nbsp;import java.util.List;
+&nbsp;
+<b class="nc">&nbsp;public class WallestScanUtils {</b>
+&nbsp;    
+&nbsp;//    public static String encodeImageToBase64String(File file) throws IOException {
+&nbsp;//        try {
+&nbsp;//            byte[] fileContent = Files.readAllBytes(file.toPath());
+&nbsp;//            return Base64.getEncoder().encodeToString(fileContent);
+&nbsp;//        } catch (FileNotFoundException e) {
+&nbsp;//            System.err.println(&quot;File not found: &quot; + e.getMessage());
+&nbsp;//            // Handle the case where the file isn&#39;t found, e.g., return null or a default value
+&nbsp;//        } catch (IOException e) {
+&nbsp;//            System.err.println(&quot;Error reading file: &quot; + e.getMessage());
+&nbsp;//            // Handle other I/O error cases here
+&nbsp;//        } catch (OutOfMemoryError e) {
+&nbsp;//            System.err.println(&quot;File too large to process: &quot; + e.getMessage());
+&nbsp;//            // Handle the case where the file is too large
+&nbsp;//        }
+&nbsp;//        return null; // or some other appropriate error value
+&nbsp;//    }
+&nbsp;
+&nbsp;    public static Receipt readTextToReceipt(List&lt;Text&gt; texts) {
+<b class="fc">&nbsp;        String storeName = texts.get(1).getDescription();</b>
+<b class="fc">&nbsp;        double total = 0.0;</b>
+<b class="fc">&nbsp;        String date = &quot;&quot;;</b>
+<b class="fc">&nbsp;        for (int i = 2; i &lt; texts.size(); i++) {</b>
+<b class="fc">&nbsp;            if (texts.get(i).getDescription().equalsIgnoreCase(&quot;TOTAL&quot;)) {</b>
+<b class="fc">&nbsp;                String getTotal = texts.get(i + 1).getDescription().replaceAll(&quot;,&quot;, &quot;&quot;);</b>
+<b class="fc">&nbsp;                if (getTotal.contains(&quot;.&quot;)) {</b>
+<b class="fc">&nbsp;                    total = Double.parseDouble(getTotal);</b>
+<b class="fc">&nbsp;                } else {</b>
+<b class="fc">&nbsp;                    total = Integer.parseInt(getTotal);</b>
+&nbsp;                }
+&nbsp;            }
+<b class="fc">&nbsp;            if (texts.get(i).getDescription().contains(&quot;/&quot;)) {</b>
+<b class="fc">&nbsp;                date = texts.get(i).getDescription();</b>
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        return new Receipt.Builder().storeName(storeName).total(total).date(date).build();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-08 22:02</div>
+</div>
+</body>
+</html>
