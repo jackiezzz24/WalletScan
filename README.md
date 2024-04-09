@@ -21,4 +21,14 @@ cd frontend/ -> run `npm start` to open frontend.
 Can review the application on http://localhost:3000
 
 ### How to test
-cd frontend/ -> run `npm test` to run test cases. 
+
++ test frontend using Jest
+  - cd frontend/
+  - run `npm test` to run test cases.
+  - run `npm run coverage` to run all the test cases with coverage
++ test backend using JUnit
+  
+  All the test cases saved in the src/test folder.
+  
+  You can check the coverage report in htmlReport/index.html
+  <img alt="Screenshot 2024-04-08 220613" src="https://github.com/jackiezzz24/WalletScan/assets/99145834/8bea2cd7-40aa-4ffd-9474-07f4fadc278b">
