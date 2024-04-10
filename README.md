@@ -35,3 +35,8 @@ Can review the application on http://localhost:3000
   You can check the coverage report in htmlReport/index.html
   
   <img alt="Screenshot 2024-04-08 220613" src="https://github.com/jackiezzz24/WalletScan/assets/99145834/8bea2cd7-40aa-4ffd-9474-07f4fadc278b">
+
+### Deployment on AWS
+
+http://walletscan.s3-website.us-east-2.amazonaws.com/
+
