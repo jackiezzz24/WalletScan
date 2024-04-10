@@ -5,7 +5,6 @@ import Button from "./Btn";
 import { plus } from "./Icons";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import receipt_image from "../../../assets/images/default-image.jpg";
 
 function Form() {
   const { addTrans, setError } = useTransactionsContext();
@@ -14,6 +13,7 @@ function Form() {
   const [previewImage, setPreviewImage] = useState(null);
   const fileInputRef = useRef(null);
   const [loading, setLoading] = useState(true);
+  const receipt_image = "https://res.cloudinary.com/dxhu2wrmc/image/upload/v1712642901/default-image_a50lz1.jpg"
 
   useEffect(() => {
     const userObject = JSON.parse(localStorage.getItem("user"));
