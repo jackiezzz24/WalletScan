@@ -29,10 +29,8 @@ describe("SignIn Form Title in SignUpForm Component", () => {
 
 describe("SignIn Component", () => {
   beforeEach(() => {
-    // Use beforeEach to wrap the component for each test
     render(
       <BrowserRouter>
-        {" "}
         <SignUpForm />
       </BrowserRouter>
     );
@@ -57,20 +55,6 @@ describe("SignIn Component", () => {
 
     expect(passwordInput).toHaveValue("123456");
   });
-
-  test("clicking on Sign In button triggers sign-in function", async () => {
-    global.fetch = jest.fn(() =>
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve({ message: "Successfully Signed In" }),
-      })
-    );
-
-    const signInButton = screen.getByTestId("signin-btn");
-    userEvent.click(signInButton);
-
-    expect(fetch).toHaveBeenCalled();
-  });
 });
 
 describe("SignUp Form Title in SignUpForm Component", () => {
@@ -91,7 +75,6 @@ describe("SignUp Form Title in SignUpForm Component", () => {
 
 describe("SignUp Component", () => {
   beforeEach(() => {
-    // Use beforeEach to wrap the component for each test
     render(
       <BrowserRouter>
         <SignUpForm />
@@ -122,63 +105,91 @@ describe("SignUp Component", () => {
     });
     expect(passwordInput).toHaveValue("testpassword");
   });
-
-  //   test("clicking on Sign Up button triggers sign-up function", async () => {
-  //     // Mock fetch function
-  //     global.fetch = jest.fn(() =>
-  //       Promise.resolve({
-  //         ok: true,
-  //         json: () => Promise.resolve({ message: 'User Sign-Up Successfully. Please Sign-In.' }),
-  //       })
-  //     );
-
-  //     // Select and click the Sign Up button
-  //     const signUpButton = screen.getByTestId("signup-btn");
-  //     console.log("Sign Up Button:", signUpButton); // Log button for debugging
-  //     userEvent.click(signUpButton);
-
-  //     // Wait for a short time to allow asynchronous operations to complete
-  //     await new Promise((resolve) => setTimeout(resolve, 100));
-
-  //     // Assert that the fetch function is called
-  //     console.log("Number of calls to fetch:", fetch.mock.calls.length);
-  //     expect(fetch).toHaveBeenCalled();
-  // });
 });
 
-describe("SignUp Component", () => {
-  afterEach(() => {
-    jest.resetAllMocks(); // Clean up mocks after each test
+global.fetch = jest.fn(() =>
+  Promise.resolve({
+    json: () =>
+      Promise.resolve({ message: "Success", token: "sampleToken", user: {} }),
+    ok: true,
+  })
+);
+
+describe("SignUpForm component", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
   });
 
-  it("clicking on Sign Up button triggers sign-up function", async () => {
-    render(
+  it("should render sign up and sign in forms", () => {
+    const { getByTestId } = render(
       <BrowserRouter>
         <SignUpForm />
       </BrowserRouter>
     );
+    expect(getByTestId("sign-up")).toBeInTheDocument();
+    expect(getByTestId("sign-in")).toBeInTheDocument();
+  });
 
-    // Mock fetch function
-    global.fetch = jest.fn(() =>
-      Promise.resolve({
-        ok: true,
-        json: () =>
-          Promise.resolve({
-            message: "User Sign-Up Successfully. Please Sign-In.",
-          }),
-      })
+  it("should call sign up API with correct data", async () => {
+    const { getByTestId } = render(
+      <BrowserRouter>
+        <SignUpForm />
+      </BrowserRouter>
     );
+    const usernameInput = getByTestId("username-input-signup");
+    const emailInput = getByTestId("email-input-signup");
+    const passwordInput = getByTestId("password-input-signup");
+    const signUpBtn = getByTestId("signup-btn");
 
-    // Select and click the Sign Up button
-    const signUpButton = screen.getByTestId("signup-btn");
-    fireEvent.click(signUpButton);
+    fireEvent.change(usernameInput, { target: { value: "testuser" } });
+    fireEvent.change(emailInput, { target: { value: "test@example.com" } });
+    fireEvent.change(passwordInput, { target: { value: "testpassword" } });
 
-    // Debugging: Log fetch mock
-    console.log("Fetch mock:", fetch);
+    fireEvent.click(signUpBtn);
 
-    // Wait for the fetch function to be called
     await waitFor(() => {
-      expect(fetch).toHaveBeenCalledTimes(1); // Ensure fetch is called exactly once
+      expect(fetch).toHaveBeenCalledWith(
+        expect.stringContaining("/auth/signup"),
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username: "testuser",
+            email: "test@example.com",
+            password: "testpassword",
+          }),
+        }
+      );
+    });
+  });
+
+  it("should call sign in API with correct data", async () => {
+    const { getByTestId } = render(
+      <BrowserRouter>
+        <SignUpForm />
+      </BrowserRouter>
+    );
+    const usernameInput = getByTestId("username-input-signin");
+    const passwordInput = getByTestId("password-input-signin");
+    const signInBtn = getByTestId("signin-btn");
+
+    fireEvent.change(usernameInput, { target: { value: "testuser" } });
+    fireEvent.change(passwordInput, { target: { value: "testpassword" } });
+
+    fireEvent.click(signInBtn);
+
+    await waitFor(() => {
+      expect(fetch).toHaveBeenCalledWith(
+        expect.stringContaining("/auth/signin"),
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username: "testuser",
+            password: "testpassword",
+          }),
+        }
+      );
     });
   });
 });
