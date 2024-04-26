@@ -109,7 +109,7 @@ function Profile() {
 
       try {
         const cloudinaryResponse = await fetch(
-          `https://api.cloudinary.com/v1_1/dxhu2wrmc/image/upload`,
+          `https://api.cloudinary.com/v1_1/xxx/image/upload`,
           {
             method: "POST",
             body: formData,

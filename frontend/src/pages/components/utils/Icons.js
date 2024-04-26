@@ -1,29 +1,66 @@
-export const dashboard = <i className="fa-solid fa-chart-line"></i>
-export const transactions = <i className="fa-solid fa-credit-card"></i>
-export const categories = <i className="fa-solid fa-tags"></i>
-export const settings = <i className="fa-solid fa-cog"></i>
-export const expenses = <i className="fa-solid fa-money-bill-transfer"></i>
-export const money = <i className="fa-solid fa-money-bill"></i>
-export const benefit = <i className ="fa-solid fa-earth-americas"></i>
-export const stocks = <i className="fa-solid fa-arrow-trend-up"></i>
-export const bitcoin = <i className="fa-brands fa-bitcoin"></i>
-export const piggy = <i className="fa-solid fa-piggy-bank"></i>
-export const card = <i className="fa-brands fa-cc-visa"></i>
-export const users = <i className="fa-solid fa-users-between-lines"></i>
-export const dollar = <i className="fa-solid fa-dollar-sign"></i>
-export const calender = <i className="fa-solid fa-calendar"></i>
-export const comment = <i className="fa-solid fa-comment"></i>
-export const plus = <i className="fa-solid fa-plus"></i>
-export const trash = <i className="fa-solid fa-trash"></i>
-export const takeaway = <i className="fa-solid fa-utensils"></i>
-export const clothing = <i className="fa-solid fa-shirt"></i>
-export const book = <i className="fa-solid fa-book-open"></i>
-export const food = <i className="fa-solid fa-basket-shopping"></i>
-export const medical = <i className="fa-solid fa-briefcase-medical"></i>
-export const travel = <i className="fa-solid fa-plane"></i>
-export const circle = <i className="fa-solid fa-circle-dot"></i>
-export const profile = <i className="fa-solid fa-user"></i>
-export const image = <i className="fa-regular fa-image"></i>
-export const report = <i className="fa-solid fa-table-list"></i>
-export const sponsor = <i className="fa-solid fa-hand-holding-heart"></i>
-export const rent = <i className="fa-solid fa-house"></i>
+import {
+  faChartLine,
+  faCreditCard,
+  faTags,
+  faCog,
+  faMoneyBillTransfer,
+  faMoneyBill,
+  faEarthAmericas,
+  faArrowTrendUp,
+  faPiggyBank,
+  faUsersBetweenLines,
+  faDollarSign,
+  faCalendar,
+  faComment,
+  faPlus,
+  faTrash,
+  faUtensils,
+  faShirt,
+  faBookOpen,
+  faBasketShopping,
+  faBriefcaseMedical,
+  faPlane,
+  faCircleDot,
+  faUser,
+  faImage,
+  faTableList,
+  faHandHoldingHeart,
+  faHouse,
+} from "@fortawesome/free-solid-svg-icons";
+
+import { faBitcoin, faCcVisa } from "@fortawesome/free-brands-svg-icons";
+
+import { faImage as faImageRegular } from "@fortawesome/free-regular-svg-icons";
+
+import React from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+export const dashboard = <FontAwesomeIcon icon={faChartLine} size="2x" />;
+export const transactions = <FontAwesomeIcon icon={faCreditCard} size="2x" />;
+export const categories = <FontAwesomeIcon icon={faTags} size="2x" />;
+export const settings = <FontAwesomeIcon icon={faCog} size="2x" />;
+export const expenses = <FontAwesomeIcon icon={faMoneyBillTransfer} size="2x" />;
+export const money = <FontAwesomeIcon icon={faMoneyBill} size="2x" />;
+export const benefit = <FontAwesomeIcon icon={faEarthAmericas} size="2x" />;
+export const stocks = <FontAwesomeIcon icon={faArrowTrendUp} size="2x" />;
+export const bitcoin = <FontAwesomeIcon icon={faBitcoin} size="2x" />;
+export const piggy = <FontAwesomeIcon icon={faPiggyBank} size="2x" />;
+export const card = <FontAwesomeIcon icon={faCcVisa} size="2x" />;
+export const users = <FontAwesomeIcon icon={faUsersBetweenLines} size="2x" />;
+export const dollar = <FontAwesomeIcon icon={faDollarSign} />;
+export const calender = <FontAwesomeIcon icon={faCalendar} size="lg" />;
+export const comment = <FontAwesomeIcon icon={faComment} size="lg" />;
+export const plus = <FontAwesomeIcon icon={faPlus} size="lg" />;
+export const trash = <FontAwesomeIcon icon={faTrash} size="2x" />;
+export const takeaway = <FontAwesomeIcon icon={faUtensils} size="2x" />;
+export const clothing = <FontAwesomeIcon icon={faShirt} size="2x" />;
+export const book = <FontAwesomeIcon icon={faBookOpen} size="2x" />;
+export const food = <FontAwesomeIcon icon={faBasketShopping} size="2x" />;
+export const medical = <FontAwesomeIcon icon={faBriefcaseMedical} size="2x" />;
+export const travel = <FontAwesomeIcon icon={faPlane} size="2x" />;
+export const circle = <FontAwesomeIcon icon={faCircleDot} size="2x" />;
+export const profile = <FontAwesomeIcon icon={faUser} size="2x" />;
+export const image = <FontAwesomeIcon icon={faImageRegular} size="2x" />;
+export const report = <FontAwesomeIcon icon={faTableList} size="2x" />;
+export const sponsor = <FontAwesomeIcon icon={faHandHoldingHeart} size="2x" />;
+export const rent = <FontAwesomeIcon icon={faHouse} size="2x" />;

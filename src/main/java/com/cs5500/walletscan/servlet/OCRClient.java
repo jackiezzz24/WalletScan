@@ -21,7 +21,7 @@ import java.util.List;
 public class OCRClient {
     
     private static String API_URL = "https://vision.googleapis.com/v1/images:annotate?key=";
-    private static String API_KEY = "AIzaSyDKaDElGw_F39jpvr5ngP2dZ476CDO1ktc";
+    private static String API_KEY = "";
     
     public String buildURL() {
         return API_URL + API_KEY;
