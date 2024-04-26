@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Button } from "./Button";
 import { Link, useNavigate } from "react-router-dom";
 import "./styles/Navbar.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faQrcode } from "@fortawesome/free-solid-svg-icons";
 
 function Navbar() {
   const [click, setClick] = useState(false);
@@ -27,7 +29,6 @@ function Navbar() {
     const authToken = localStorage.getItem("authToken");
     setIsAuthenticated(!!authToken);
   }, [localStorage.getItem("authToken")]);
-  
 
   window.addEventListener("resize", showButton);
 
@@ -45,8 +46,8 @@ function Navbar() {
       <nav className="navbar">
         <div className="navbar-container">
           <Link to="/" className="navbar-logo" onClick={closeMobileMenu}>
-            WalletScan
-            <i className="fa-solid fa-qrcode fa-fw" />
+            <span style={{ paddingRight: "8px" }}>WalletScan</span>
+            <FontAwesomeIcon icon={faQrcode} />
           </Link>
           <div className="menu-icon" onClick={handleClick}>
             <i className={click ? "fas fa-times" : "fas fa-bars"} />

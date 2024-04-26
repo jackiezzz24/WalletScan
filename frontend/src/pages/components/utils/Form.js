@@ -13,7 +13,7 @@ function Form() {
   const [previewImage, setPreviewImage] = useState(null);
   const fileInputRef = useRef(null);
   const [loading, setLoading] = useState(true);
-  const receipt_image = "https://res.cloudinary.com/dxhu2wrmc/image/upload/v1712642901/default-image_a50lz1.jpg"
+  const receipt_image = "https://res.cloudinary.com/xxx/image/upload/v1712642901/default-image_a50lz1.jpg"
 
   useEffect(() => {
     const userObject = JSON.parse(localStorage.getItem("user"));
@@ -155,7 +155,7 @@ function Form() {
 
     try {
       const cloudinaryResponse = await fetch(
-        `https://api.cloudinary.com/v1_1/dxhu2wrmc/image/upload`,
+        `https://api.cloudinary.com/v1_1/xxx/image/upload`,
         {
           method: "POST",
           body: formData,
@@ -335,7 +335,7 @@ function Form() {
           )}
         </div>
         <p style={{ textAlign: "center" }}>
-          Using generative AI (OCR API) to read text from uploaded image
+          Using generative AI (OCR API) to read text
         </p>
         <div className="file-input">
           <input
